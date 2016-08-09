@@ -1,0 +1,17 @@
+﻿生成启动时间为 2016/8/9 17:11:43。
+     1>项目“F:\ImgTest\ImgTest\ImgTest.vcxproj”在节点 2 上(Build 个目标)。
+     1>Link:
+         D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"F:\ImgTest\x64\Debug\\ImgTest.exe" /NOLOGO /LIBPATH:"D:\Program Files\gdal\lib" /LIBPATH:"D:\Program Files (x86)\opencv\qt\5.5\msvc2013_64\lib" gdal_i.lib qtmaind.lib Qt5Cored.lib Qt5Guid.lib Qt5Testd.lib Qt5Widgetsd.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"F:\ImgTest\x64\Debug\ImgTest.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"F:\ImgTest\x64\Debug\ImgTest.lib" /MACHINE:X64  /SUBSYSTEM:WINDOWS x64\Debug\ImgTest.res
+         x64\Debug\moc_MapCanvas.obj
+         x64\Debug\moc_UIImgTest.obj
+         x64\Debug\qrc_imgtest.obj
+         x64\Debug\MapCanvas.obj
+         x64\Debug\UIImgTest.obj
+         x64\Debug\main.obj
+            正在创建库 F:\ImgTest\x64\Debug\ImgTest.lib 和对象 F:\ImgTest\x64\Debug\ImgTest.exp
+         ImgTest.vcxproj -> F:\ImgTest\x64\Debug\ImgTest.exe
+     1>已完成生成项目“F:\ImgTest\ImgTest\ImgTest.vcxproj”(Build 个目标)的操作。
+
+生成成功。
+
+已用时间 00:00:01.29
