@@ -7,6 +7,8 @@
 #include <QMatrix>
 #include <QWheelEvent>
 #include <QtWidgets\QScrollBar>
+#include <opencv.hpp>
+#include <gdal_priv.h>
 
 MapCanvas::MapCanvas( QWidget *parent /*= 0 */ )
     : QGraphicsView( parent )
@@ -46,21 +48,38 @@ void MapCanvas::ReadImg( const QString imgPath )
     ShowFileList( imgPath );
     ShowImgInfor( imgPath );
     // 如果图像文件并非三个波段，则默认只显示第一波段灰度图像
-    //if ( poDataset->GetRasterCount() != 3 )
-    //{
-    //    m_showColor = false;
-    //    ShowBand( poDataset->GetRasterBand( 2 ) );
-    //}
-    // 如果图像正好三个波段，则默认以RGB的顺序显示彩色图
-    //else
-   // {
+	if (poDataset->GetRasterCount() == 3)
+	{
+		m_showColor = true;
+		QList<GDALRasterBand*> bandList;
+		bandList.append(poDataset->GetRasterBand(1));
+		bandList.append(poDataset->GetRasterBand(2));
+		bandList.append(poDataset->GetRasterBand(3));
+		ImgProcess(&bandList,1);
+	}
+    else if ( poDataset->GetRasterCount() > 3)
+    {
         m_showColor = true;
-        QList<GDALRasterBand*> bandList;
-        bandList.append( poDataset->GetRasterBand( 1 ) );
-        bandList.append( poDataset->GetRasterBand( 2 ) );
-        bandList.append( poDataset->GetRasterBand( 3 ) );
-        ShowImg( &bandList );
-   // }
+		int countRas = poDataset->GetRasterCount();
+		QList<GDALRasterBand*> bandListA,bandListB;
+		bandListA.append(poDataset->GetRasterBand(1));
+		bandListA.append(poDataset->GetRasterBand(2));
+		bandListA.append(poDataset->GetRasterBand(3));
+
+		bandListB.append(poDataset->GetRasterBand(countRas-2));
+		bandListB.append(poDataset->GetRasterBand(countRas-1));
+		bandListB.append(poDataset->GetRasterBand(countRas));
+
+		ImgProcess(&bandListB,2);
+		ImgProcess(&bandListA,1);
+
+    }
+    // 如果图像正好三个波段，则默认以RGB的顺序显示彩色图
+    else
+    {
+		m_showColor = false;
+		ShowBand(poDataset->GetRasterBand(1));
+    }
     GDALClose( poDataset );
 }
 
@@ -90,21 +109,48 @@ void MapCanvas::ShowBand( GDALRasterBand* band )
     myBand.append( band );
     myBand.append( band );
     
-    ShowImg( &myBand );
+	ImgProcess(&myBand,1);
     
 }
 
 /// <summary>
-/// 显示图像
+/// 图像显示格式转换
+/// </summary>
+/// <param name="img">QIMAGE图像格式</param>
+IplImage *ConvertToIplImage(const QImage &img)
+{
+	int nChannel = 0;
+	if (img.format() == QImage::Format_RGB888)nChannel = 3;
+	if (nChannel == 0)return false;
+	IplImage *iplImg = cvCreateImageHeader(cvSize(img.width(), img.height()), 8, nChannel);
+	iplImg->imageData = (char*)img.bits();
+	if (nChannel == 3)
+		cvConvertImage(iplImg, iplImg, CV_CVTIMG_SWAP_RB);
+	return iplImg;
+}
+
+/// <summary>
+/// 显示内存中图像文件
+/// </summary>
+/// <param name="processer">QIMAGE图像格式</param>
+void MapCanvas::Imgview(QImage processer)
+{
+	QGraphicsPixmapItem *imgItem = new QGraphicsPixmapItem(QPixmap::fromImage(processer));
+	QGraphicsScene *myScene = new QGraphicsScene();
+	myScene->addItem(imgItem);
+	this->setScene(myScene);
+}
+
+/// <summary>
+/// 图像分波段处理
 /// </summary>
 /// <param name="imgBand">图像波段</param>
-void MapCanvas::ShowImg( QList<GDALRasterBand*> *imgBand )
+void MapCanvas::ImgProcess( QList<GDALRasterBand*> *imgBand,int count)
 {
     if ( imgBand->size() != 3 )
     {
         return;
     }
-    
     int imgWidth = imgBand->at( 0 )->GetXSize();
     int imgHeight = imgBand->at( 0 )->GetYSize();
     
@@ -155,13 +201,25 @@ void MapCanvas::ShowImg( QList<GDALRasterBand*> *imgBand )
             allBandUC[h * bytePerLine + w * 3 + 2] = bBandUC[h * iScaleWidth + w];
         }
     }
-    
-    // 构造图像并显示
-    QGraphicsPixmapItem *imgItem = new QGraphicsPixmapItem(  QPixmap::fromImage( QImage( allBandUC, iScaleWidth, iScaleHeight, bytePerLine, QImage::Format_RGB888  ) ) );
-    QGraphicsScene *myScene = new QGraphicsScene();
-    myScene->addItem( imgItem );
-    this->setScene( myScene );
+	QImage ImgTemp = QImage(allBandUC, iScaleWidth, iScaleHeight, bytePerLine, QImage::Format_RGB888);
+	Imgview(ImgTemp);
+	IplImage* iimg = ConvertToIplImage(ImgTemp);
+	if (count == 1)
+	{
+		OriginalDataA = cv::cvarrToMat(iimg);
+		cv::imshow("str", OriginalDataA);
+	}
+	else
+	{
+		OriginalDataB = cv::cvarrToMat(iimg);
+		cv::imshow("str2", OriginalDataB);
+	}
+
+    // 构造图像
 }
+
+
+
 
 /// <summary>
 /// 显示图像基本信息

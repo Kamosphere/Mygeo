@@ -11,7 +11,7 @@
 #include <QtWidgets\QGraphicsView>
 #include <QStandardItemModel>
 #include <gdal_priv.h>
-
+#include <opencv.hpp>
 
 /// <summary>
 /// Class MapCanvas.
@@ -83,10 +83,14 @@ protected:
 	void mouseReleaseEvent(QMouseEvent *event);
 
 private:
+	cv::Mat OriginalDataA;
+	cv::Mat OriginalDataB;
 	void ShowBand(GDALRasterBand* band);
-	void ShowImg(QList<GDALRasterBand*> *imgBand);
+	void ImgProcess(QList<GDALRasterBand*> *imgBand,int count);
+	void Imgview(QImage processer);
 	void ShowImgInfor(const QString filename);
 	void ShowFileList(const QString filename);
+	cv::Mat GDAL2Mat(const QString filename);
 	unsigned char* ImgSketch(float* buffer, GDALRasterBand* currentBand, int size, double noValue);
 	/// <summary>
 	/// 图像缩放
