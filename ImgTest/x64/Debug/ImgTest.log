@@ -1,13 +1,19 @@
-﻿生成启动时间为 2016/8/30 23:15:33。
-     1>项目“F:\ImgTest\ImgTest\ImgTest.vcxproj”在节点 2 上(Build 个目标)。
+﻿生成启动时间为 2016/9/13 22:52:50。
+     1>项目“F:\Mygeo\ImgTest\ImgTest.vcxproj”在节点 2 上(Build 个目标)。
      1>CustomBuild:
+         Moc'ing UIImgTest.h...
+         Uic'ing imgtest.ui...
          Moc'ing MapCanvas.h...
+         Rcc'ing imgtest.qrc...
+     1>RCC : warning : No resources in 'F:\Mygeo\ImgTest\imgtest.qrc'.
+         
        ClCompile:
-         D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /I"D:\Program Files\gdal\include" /I.\GeneratedFiles /I. /I"D:\Program Files (x86)\opencv\qt\5.5\msvc2013_64\include" /I.\GeneratedFiles\Debug /I"D:\Program Files (x86)\opencv\qt\5.5\msvc2013_64\include\QtCore" /I"D:\Program Files (x86)\opencv\qt\5.5\msvc2013_64\include\QtGui" /I"D:\Program Files (x86)\opencv\qt\5.5\msvc2013_64\include\QtTest" /I"D:\Program Files (x86)\opencv\qt\5.5\msvc2013_64\include\QtWidgets" /Zi /nologo /W1 /WX- /Od /D QT_CORE_LIB /D QT_DLL /D QT_GUI_LIB /D QT_LARGEFILE_SUPPORT /D UNICODE /D UNICODE /D WIN32 /D WIN32 /D WIN64 /D QT_TESTLIB_LIB /D QT_WIDGETS_LIB /Gm- /EHsc /MDd /GS /fp:precise /Zc:wchar_t- /Zc:forScope /Fo"x64\Debug\\" /Fd"x64\Debug\vc120.pdb" /Gd /TP /errorReport:prompt GeneratedFiles\Debug\moc_MapCanvas.cpp MapCanvas.cpp UIImgTest.cpp
+         D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /I"D:\Program Files\gdal\include" /I.\GeneratedFiles /I. /I"D:\Program Files (x86)\opencv\qt\5.5\msvc2013_64\include" /I.\GeneratedFiles\Debug /I"D:\Program Files (x86)\opencv\qt\5.5\msvc2013_64\include\QtCore" /I"D:\Program Files (x86)\opencv\qt\5.5\msvc2013_64\include\QtGui" /I"D:\Program Files (x86)\opencv\qt\5.5\msvc2013_64\include\QtTest" /I"D:\Program Files (x86)\opencv\qt\5.5\msvc2013_64\include\QtWidgets" /Zi /nologo /W1 /WX- /Od /D QT_CORE_LIB /D QT_DLL /D QT_GUI_LIB /D QT_LARGEFILE_SUPPORT /D UNICODE /D UNICODE /D WIN32 /D WIN32 /D WIN64 /D QT_TESTLIB_LIB /D QT_WIDGETS_LIB /Gm- /EHsc /MDd /GS /fp:precise /Zc:wchar_t- /Zc:forScope /Fo"x64\Debug\\" /Fd"x64\Debug\vc120.pdb" /Gd /TP /errorReport:prompt GeneratedFiles\Debug\moc_MapCanvas.cpp GeneratedFiles\Debug\moc_UIImgTest.cpp MapCanvas.cpp UIImgTest.cpp main.cpp
          moc_MapCanvas.cpp
      1>D:\Program Files (x86)\opencv\opencv\build\include\opencv2/core/mat.hpp(1965): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
      1>D:\Program Files (x86)\opencv\opencv\build\include\opencv2/core/persistence.hpp : warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
      1>D:\Program Files (x86)\opencv\opencv\build\include\opencv2/core/utility.hpp : warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+         moc_UIImgTest.cpp
          MapCanvas.cpp
      1>D:\Program Files (x86)\opencv\opencv\build\include\opencv2/core/mat.hpp(1965): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
      1>D:\Program Files (x86)\opencv\opencv\build\include\opencv2/core/persistence.hpp : warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
@@ -16,18 +22,24 @@
      1>D:\Program Files (x86)\opencv\opencv\build\include\opencv2/core/mat.hpp(1965): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
      1>D:\Program Files (x86)\opencv\opencv\build\include\opencv2/core/persistence.hpp : warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
      1>D:\Program Files (x86)\opencv\opencv\build\include\opencv2/core/utility.hpp : warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+         main.cpp
          正在生成代码...
+         D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /I"D:\Program Files\gdal\include" /I.\GeneratedFiles /I. /I"D:\Program Files (x86)\opencv\qt\5.5\msvc2013_64\include" /I.\GeneratedFiles\Debug /I"D:\Program Files (x86)\opencv\qt\5.5\msvc2013_64\include\QtCore" /I"D:\Program Files (x86)\opencv\qt\5.5\msvc2013_64\include\QtGui" /I"D:\Program Files (x86)\opencv\qt\5.5\msvc2013_64\include\QtTest" /I"D:\Program Files (x86)\opencv\qt\5.5\msvc2013_64\include\QtWidgets" /Zi /nologo /W1 /WX- /Od /D QT_CORE_LIB /D QT_DLL /D QT_GUI_LIB /D QT_LARGEFILE_SUPPORT /D UNICODE /D UNICODE /D WIN32 /D WIN32 /D WIN64 /D QT_TESTLIB_LIB /D QT_WIDGETS_LIB /Gm- /EHsc /MDd /GS /fp:precise /Zc:wchar_t- /Zc:forScope /Fo"x64\Debug\\" /Fd"x64\Debug\vc120.pdb" /Gd /TP /errorReport:prompt GeneratedFiles\qrc_imgtest.cpp
+         qrc_imgtest.cpp
+       ResourceCompile:
+         C:\Program Files (x86)\Windows Kits\8.1\bin\x86\rc.exe /l"0x0409" /nologo /fo"x64\Debug\ImgTest.res" ImgTest.rc 
        Link:
-         D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"F:\ImgTest\x64\Debug\\ImgTest.exe" /NOLOGO /LIBPATH:"D:\Program Files\gdal\lib" /LIBPATH:"D:\Program Files (x86)\opencv\qt\5.5\msvc2013_64\lib" gdal_i.lib qtmaind.lib Qt5Cored.lib Qt5Guid.lib Qt5Testd.lib Qt5Widgetsd.lib opencv_world310d.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"F:\ImgTest\x64\Debug\ImgTest.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"F:\ImgTest\x64\Debug\ImgTest.lib" /MACHINE:X64  /SUBSYSTEM:WINDOWS x64\Debug\ImgTest.res
+         D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"F:\Mygeo\x64\Debug\\ImgTest.exe" /NOLOGO /LIBPATH:"D:\Program Files\gdal\lib" /LIBPATH:"D:\Program Files (x86)\opencv\qt\5.5\msvc2013_64\lib" gdal_i.lib qtmaind.lib Qt5Cored.lib Qt5Guid.lib Qt5Testd.lib Qt5Widgetsd.lib opencv_world310d.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"F:\Mygeo\x64\Debug\ImgTest.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"F:\Mygeo\x64\Debug\ImgTest.lib" /MACHINE:X64  /SUBSYSTEM:WINDOWS x64\Debug\ImgTest.res
          x64\Debug\moc_MapCanvas.obj
          x64\Debug\moc_UIImgTest.obj
          x64\Debug\qrc_imgtest.obj
          x64\Debug\MapCanvas.obj
          x64\Debug\UIImgTest.obj
          x64\Debug\main.obj
-         ImgTest.vcxproj -> F:\ImgTest\x64\Debug\ImgTest.exe
-     1>已完成生成项目“F:\ImgTest\ImgTest\ImgTest.vcxproj”(Build 个目标)的操作。
+            正在创建库 F:\Mygeo\x64\Debug\ImgTest.lib 和对象 F:\Mygeo\x64\Debug\ImgTest.exp
+         ImgTest.vcxproj -> F:\Mygeo\x64\Debug\ImgTest.exe
+     1>已完成生成项目“F:\Mygeo\ImgTest\ImgTest.vcxproj”(Build 个目标)的操作。
 
 生成成功。
 
-已用时间 00:00:04.91
+已用时间 00:00:07.48
