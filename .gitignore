@@ -280,7 +280,7 @@ __pycache__/
 # Compiled Dynamic libraries
 *.so
 *.dylib
-*.dll
+
 
 # Fortran module files
 *.mod
@@ -317,7 +317,7 @@ __pycache__/
 *.lo
 
 # Shared objects (inc. Windows DLLs)
-*.dll
+
 *.so
 *.so.*
 *.dylib
@@ -343,7 +343,7 @@ __pycache__/
 *.la
 *.lai
 *.so
-*.dll
+
 *.dylib
 
 # Qt-es
