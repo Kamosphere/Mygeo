@@ -207,14 +207,14 @@ void MapCanvas::ImgProcess( QList<GDALRasterBand*> *imgBand,int count)
 	if (count == 1)
 	{
 		OriginalDataA = cv::cvarrToMat(iimg);
-		cv::imshow("str", OriginalDataA);
+		//cv::imshow("str", OriginalDataA);
 	}
 	else
 	{
 		OriginalDataB = cv::cvarrToMat(iimg);
-		cv::imshow("str2", OriginalDataB);
+		//cv::imshow("str2", OriginalDataB);
 	}
-
+	
     // 构造图像
 }
 
