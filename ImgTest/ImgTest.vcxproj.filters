@@ -80,4 +80,15 @@
   <ItemGroup>
     <ResourceCompile Include="ImgTest.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="HSIBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WatershedMain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RelationBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>

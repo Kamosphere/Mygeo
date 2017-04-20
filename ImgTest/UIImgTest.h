@@ -10,12 +10,33 @@
 
 #include <QtWidgets\QMainWindow>
 #include "ui_imgtest.h"
+#include<qthread.h>
+
 
 class MapCanvas;
 
 /// <summary>
 /// Class ImgTest.
 /// </summary>
+
+
+class MyThread : public QThread
+{
+	Q_OBJECT
+public:
+	explicit MyThread(MapCanvas *MyMap,QObject *parent = 0);
+
+protected:
+	void run();
+
+private:
+	MapCanvas* myMapcopy;
+
+signals:
+	public slots :
+};
+
+
 class UIImgTest : public QMainWindow
 {
     Q_OBJECT
@@ -28,6 +49,10 @@ public slots:
     void Exit();
     void ShowFileListWindow();
     void ShowInforWindow();
+	void Extract();
+	void newtab();
+	void saveResult();
+	void progressBar();
 private:
     /// <summary>
     /// 主窗口UI
@@ -36,7 +61,12 @@ private:
     /// <summary>
     /// 图像显示窗口控件
     /// </summary>
+	QTabWidget *tabWidget;
     MapCanvas *myMap;
+	MapCanvas *myMap2;
+	MyThread *my;
+	QTimer *timer;
+	bool ifExtract = false;
 };
 
 #endif // IMGTEST_H

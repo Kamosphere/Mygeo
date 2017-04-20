@@ -31,12 +31,41 @@ MapCanvas::~MapCanvas()
 
 }
 
+cv::Mat QImageToMat(QImage image)
+{
+	cv::Mat mat;
+	switch (image.format())
+	{
+	case QImage::Format_ARGB32:
+	case QImage::Format_RGB32:
+	case QImage::Format_ARGB32_Premultiplied:
+		mat = cv::Mat(image.height(), image.width(), CV_8UC4, (void*)image.constBits(), image.bytesPerLine());
+		break;
+	case QImage::Format_RGB888:
+		mat = cv::Mat(image.height(), image.width(), CV_8UC3, (void*)image.constBits(), image.bytesPerLine());
+		cv::cvtColor(mat, mat, CV_BGR2RGB);
+		break;
+	case QImage::Format_Indexed8:
+		mat = cv::Mat(image.height(), image.width(), CV_8UC1, (void*)image.constBits(), image.bytesPerLine());
+		break;
+	}
+	return mat;
+}
+
+bool MapCanvas::isMatEmpty(){
+	if (OriginalDataA.empty()){
+		return true;
+	}
+	return false;
+}
+
 /// <summary>
 /// 读取图像文件
 /// </summary>
 /// <param name="imgPath">图像文件</param>
 void MapCanvas::ReadImg( const QString imgPath )
 {
+	
     GDALAllRegister();
     CPLSetConfigOption( "GDAL_FILENAME_IS_UTF8", "NO" );
     poDataset = ( GDALDataset* )GDALOpen( imgPath.toStdString().c_str(), GA_ReadOnly );
@@ -55,24 +84,33 @@ void MapCanvas::ReadImg( const QString imgPath )
 		bandList.append(poDataset->GetRasterBand(1));
 		bandList.append(poDataset->GetRasterBand(2));
 		bandList.append(poDataset->GetRasterBand(3));
-		ImgProcess(&bandList,1);
+		QImage A=ImgProcess(&bandList,1);
+		Imgview(A);
+		OriginalDataA = QImageToMat(A);
 	}
     else if ( poDataset->GetRasterCount() > 3)
     {
         m_showColor = true;
 		int countRas = poDataset->GetRasterCount();
 		QList<GDALRasterBand*> bandListA,bandListB;
-		bandListA.append(poDataset->GetRasterBand(1));
-		bandListA.append(poDataset->GetRasterBand(2));
 		bandListA.append(poDataset->GetRasterBand(3));
+		bandListA.append(poDataset->GetRasterBand(2));
+		bandListA.append(poDataset->GetRasterBand(1));
 
-		bandListB.append(poDataset->GetRasterBand(countRas-2));
-		bandListB.append(poDataset->GetRasterBand(countRas-1));
 		bandListB.append(poDataset->GetRasterBand(countRas));
+		bandListB.append(poDataset->GetRasterBand(countRas-1));
+		bandListB.append(poDataset->GetRasterBand(countRas-2));
 
-		ImgProcess(&bandListB,2);
-		ImgProcess(&bandListA,1);
-
+		QImage B=ImgProcess(&bandListB,2);
+		QImage A=ImgProcess(&bandListA,1);
+		Imgview(A);
+		//IplImage* iimg = ConvertToIplImage(ImgTemp);
+		OriginalDataB = QImageToMat(B);
+		OriginalDataA = QImageToMat(A);
+		cv::Mat wshed;
+		addWeighted(OriginalDataA, 0.1, OriginalDataB, 0.9, 0, wshed);
+		//cv::imshow("test", wshed);
+		//cv::imwrite("out.jpg", A1);
     }
     // 如果图像正好三个波段，则默认以RGB的顺序显示彩色图
     else
@@ -129,6 +167,8 @@ IplImage *ConvertToIplImage(const QImage &img)
 	return iplImg;
 }
 
+
+
 /// <summary>
 /// 显示内存中图像文件
 /// </summary>
@@ -145,19 +185,23 @@ void MapCanvas::Imgview(QImage processer)
 /// 图像分波段处理
 /// </summary>
 /// <param name="imgBand">图像波段</param>
-void MapCanvas::ImgProcess( QList<GDALRasterBand*> *imgBand,int count)
+QImage MapCanvas::ImgProcess( QList<GDALRasterBand*> *imgBand,int count)
 {
+	cv::Mat iimg;
+	QImage iimg2;
     if ( imgBand->size() != 3 )
     {
-        return;
+        return iimg2;
     }
     int imgWidth = imgBand->at( 0 )->GetXSize();
     int imgHeight = imgBand->at( 0 )->GetYSize();
     
     m_scaleFactor = this->height() * 1.0 / imgHeight;
     
-    int iScaleWidth = ( int )( imgWidth * m_scaleFactor - 1 );
-    int iScaleHeight = ( int )( imgHeight * m_scaleFactor - 1 );
+    //int iScaleWidth = ( int )( imgWidth * m_scaleFactor - 1 );
+   // int iScaleHeight = ( int )( imgHeight * m_scaleFactor - 1 );
+	int iScaleWidth = (int)(imgWidth);
+	int iScaleHeight = (int)(imgHeight);
     
     GDALDataType dataType = imgBand->at( 0 )->GetRasterDataType();
     
@@ -202,19 +246,21 @@ void MapCanvas::ImgProcess( QList<GDALRasterBand*> *imgBand,int count)
         }
     }
 	QImage ImgTemp = QImage(allBandUC, iScaleWidth, iScaleHeight, bytePerLine, QImage::Format_RGB888);
-	Imgview(ImgTemp);
-	IplImage* iimg = ConvertToIplImage(ImgTemp);
+	
+	/*cv::imshow("str", iimg);
 	if (count == 1)
 	{
-		OriginalDataA = cv::cvarrToMat(iimg);
-		//cv::imshow("str", OriginalDataA);
+		IplImage OriginalDataA(iimg);
+		cvShowImage("str", &OriginalDataA);
+		cvSaveImage("out.jpg", &OriginalDataA);
 	}
 	else
 	{
-		OriginalDataB = cv::cvarrToMat(iimg);
-		//cv::imshow("str2", OriginalDataB);
-	}
-	
+		IplImage OriginalDataB(iimg);
+		cvShowImage("str2", &OriginalDataB);
+		
+	}*/
+	return ImgTemp;
     // 构造图像
 }
 

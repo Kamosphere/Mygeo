@@ -23,6 +23,7 @@ class MapCanvas : public QGraphicsView
 public:
 	MapCanvas(QWidget *parent = 0);
 	~MapCanvas();
+	bool isMatEmpty();
 	void ReadImg(const QString imgPath);
 	void CloseCurrentImg();
 	/// <summary>
@@ -75,7 +76,12 @@ public:
 	{
 		ScaleImg(0.8);
 	};
-
+	cv::Mat getMatDataA(){
+		return OriginalDataA;
+	}
+	cv::Mat getMatDataB(){
+		return OriginalDataB;
+	}
 protected:
 	void wheelEvent(QWheelEvent *event);
 	void mousePressEvent(QMouseEvent *event);
@@ -86,11 +92,12 @@ private:
 	cv::Mat OriginalDataA;
 	cv::Mat OriginalDataB;
 	void ShowBand(GDALRasterBand* band);
-	void ImgProcess(QList<GDALRasterBand*> *imgBand,int count);
+	QImage ImgProcess(QList<GDALRasterBand*> *imgBand,int count);
 	void Imgview(QImage processer);
 	void ShowImgInfor(const QString filename);
 	void ShowFileList(const QString filename);
 	cv::Mat GDAL2Mat(const QString filename);
+
 	unsigned char* ImgSketch(float* buffer, GDALRasterBand* currentBand, int size, double noValue);
 	/// <summary>
 	/// 图像缩放
