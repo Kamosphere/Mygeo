@@ -12,8 +12,6 @@ int main( int argc, char *argv[] )
         codec = QTextCodec::codecForLocale();
         
     QTextCodec::setCodecForLocale( codec );
-//    QTextCodec::setCodecForTr( codec );
-//    QTextCodec::setCodecForCStrings( codec );
     
     UIImgTest w;
     w.show();

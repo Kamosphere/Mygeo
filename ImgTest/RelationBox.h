@@ -1,4 +1,4 @@
-
+ï»¿
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include<iostream>
@@ -25,22 +25,23 @@ private:
 public:
 	RelationBox(int MaxCounter, Mat Marks,int SUM)
 	{
-		//ÏòÁ¿µÚÒ»Î»£¨at(0)£©´æ´¢ÁÚÓò¸öÊı£¬µÚ¶şÎ»£¨at(1)£©´æ´¢É«µ÷£¨H£©¾ùÖµ£¬µÚÈıÎ»£¨at(2)£©´æ´¢±¥ºÍ¶È£¨S£©¾ùÖµ£¬µÚËÄÎ»£¨at(3)£©´æ´¢ÇøÓòÄÚÏñËØ¸öÊı£¬µÚÎåÎ»£¨at(4)£©´æ´¢±êºÅÎ»£¬µÚÁùÎ»£¨at(5)£©´æ´¢ÖÜ³¤£¬µÚÆßÎ»£¨at(6)£©´æ´¢ban£¬Ö®ºó´æ´¢ÁÚÓòÃÇµÄÇøÓò±êºÅ
-		//µÚÆßÎ»banÎ»È¡Öµ£º 0£¨Ä¬ÈÏ£©--²»ban£¬1--ban£¬±»ÅĞ¶¨Îª¿Ï¶¨²»ÊÇ·¿Îİ
+		//å‘é‡ç¬¬ä¸€ä½ï¼ˆat(0)ï¼‰å­˜å‚¨é‚»åŸŸä¸ªæ•°ï¼Œç¬¬äºŒä½ï¼ˆat(1)ï¼‰å­˜å‚¨è‰²è°ƒï¼ˆHï¼‰å‡å€¼ï¼Œç¬¬ä¸‰ä½ï¼ˆat(2)ï¼‰å­˜å‚¨é¥±å’Œåº¦ï¼ˆSï¼‰å‡å€¼ï¼Œ
+		//ç¬¬å››ä½ï¼ˆat(3)ï¼‰å­˜å‚¨åŒºåŸŸå†…åƒç´ ä¸ªæ•°ï¼Œç¬¬äº”ä½ï¼ˆat(4)ï¼‰å­˜å‚¨æ ‡å·ä½ï¼Œç¬¬å…­ä½ï¼ˆat(5)ï¼‰å­˜å‚¨å‘¨é•¿ï¼Œ
+		//ç¬¬ä¸ƒä½ï¼ˆat(6)ï¼‰å­˜å‚¨ban,å–å€¼ï¼š 0ï¼ˆé»˜è®¤ï¼‰--ä¸banï¼Œ1--banï¼Œè¢«åˆ¤å®šä¸ºè‚¯å®šä¸æ˜¯æˆ¿å±‹ï¼Œä¹‹åå­˜å‚¨é‚»åŸŸä»¬çš„åŒºåŸŸæ ‡å·
 		maxCounter = MaxCounter;
 		relationMatrix = new vector<float>[maxCounter + 1];
 		marks = Marks;
-		persize = 7;//Õâ¸öÊı×Ö¾ÍÊÇ¹ØÏµ¾ØÕóÖĞ£¬ÇøÓòºÅÖ®Ç°µÄ¸÷ÖÖĞÅÏ¢µÄÊıÁ¿£¬ÏÖÔÚ¸ÄÎª7
+		persize = 7;//è¿™ä¸ªæ•°å­—å°±æ˜¯å…³ç³»çŸ©é˜µä¸­ï¼ŒåŒºåŸŸå·ä¹‹å‰çš„å„ç§ä¿¡æ¯çš„æ•°é‡ï¼Œç°åœ¨æ”¹ä¸º7
 		Sumpoint = SUM;
 
-		//ËùÓĞÏòÁ¿ÏÈ²åÈëÆß¸ö 0£¬ÆßÖ®ºó´æ´¢ÁÚÓòÇøÓòºÅ
+		//æ‰€æœ‰å‘é‡å…ˆæ’å…¥ä¸ƒä¸ª0ï¼Œä¸ƒä¹‹åå­˜å‚¨é‚»åŸŸåŒºåŸŸå·
 		for (int i = 0; i < maxCounter + 1; i++)
 		{
 			for (int j = 0; j < persize; j++)//5->7
 				relationMatrix[i].push_back(float(0));
 		}
 
-		//È·¶¨ÁÚ½Ó¹ØÏµ
+		//ç¡®å®šé‚»æ¥å…³ç³»
 		for (int i = 0; i < marks.rows; i++)
 		{
 			for (int j = 0; j < marks.cols; j++)
@@ -50,30 +51,30 @@ public:
 				std::vector<int> neigZones;
 				std::vector<int>::iterator neigZonesIterator;
 				int qContainer = -2;
-				int numWshed = 0; //ÁÚÓòÖĞÓĞ¶àÉÙ¸öÏñËØÊôÓÚ·ÖË®Áë£¬Èç¹û²»µÈÓÚ1²»µÈÓÚ2£¬Ö®ºó¾Í²»¿¼ÂÇÕâ¸öÏñËØÁË
-				int container0 = 0; //Êµ¼ÊÉÏ·Ö¸îÇøÓòµÄ±êºÅ´Ó1¿ªÊ¼
+				int numWshed = 0; //é‚»åŸŸä¸­æœ‰å¤šå°‘ä¸ªåƒç´ å±äºåˆ†æ°´å²­ï¼Œå¦‚æœä¸ç­‰äº1ä¸ç­‰äº2ï¼Œä¹‹åå°±ä¸è€ƒè™‘è¿™ä¸ªåƒç´ äº†
+				int container0 = 0; //å®é™…ä¸Šåˆ†å‰²åŒºåŸŸçš„æ ‡å·ä»1å¼€å§‹
 				int container1 = 0;
 
-				//Èç¹û¸ÃµãÊÇ·ÖË®Áë
+				//å¦‚æœè¯¥ç‚¹æ˜¯åˆ†æ°´å²­
 				if (marks.at<int>(i, j) == -1)
 				{
-					//¿´ËûµÄ°ËÁÚÓò£¬x-j£¬y-i
-					//×ó
+					//çœ‹ä»–çš„å…«é‚»åŸŸï¼Œx-jï¼Œy-i
+					//å·¦
 					if (j - 1 >= 0)
 					{
-						// ×óÁÚÓò
-						//ÒÔÏÂ²Ù×÷¶Ô°ËÁÚÓòÏñËØÖØ¸´
+						// å·¦é‚»åŸŸ
+						//ä»¥ä¸‹æ“ä½œå¯¹å…«é‚»åŸŸåƒç´ é‡å¤
 						qContainer = marks.at<int>(i, j - 1);
 						if (qContainer == -1)
 						{
 							numWshed++;
 						}
 						neigZonesIterator = find(neigZones.begin(), neigZones.end(), qContainer);
-						if ((neigZonesIterator == neigZones.end()) && (qContainer != -1)) //Õâ¸öÏñËØµÄÕâ¸öÁÚÓòµÄÈİÆ÷±êºÅÖµ»¹Ã»±»´æ¹ı£¬²¢ÇÒ²»ÊÇ-1
+						if ((neigZonesIterator == neigZones.end()) && (qContainer != -1)) //è¿™ä¸ªåƒç´ çš„è¿™ä¸ªé‚»åŸŸçš„å®¹å™¨æ ‡å·å€¼è¿˜æ²¡è¢«å­˜è¿‡ï¼Œå¹¶ä¸”ä¸æ˜¯-1
 						{
 							neigZones.push_back(qContainer);
 						}
-						if (i - 1 >= 0)	 // ×óÏÂ½Ç
+						if (i - 1 >= 0)	 // å·¦ä¸‹è§’
 						{
 							qContainer = marks.at<int>(i - 1, j - 1);
 							if (qContainer == -1)
@@ -81,12 +82,12 @@ public:
 								numWshed++;
 							}
 							neigZonesIterator = find(neigZones.begin(), neigZones.end(), qContainer);
-							if ((neigZonesIterator == neigZones.end()) && (qContainer != -1)) //Õâ¸öÏñËØµÄÕâ¸öÁÚÓòµÄÈİÆ÷±êºÅÖµ»¹Ã»±»´æ¹ı£¬²¢ÇÒ²»ÊÇ-1
+							if ((neigZonesIterator == neigZones.end()) && (qContainer != -1)) //è¿™ä¸ªåƒç´ çš„è¿™ä¸ªé‚»åŸŸçš„å®¹å™¨æ ‡å·å€¼è¿˜æ²¡è¢«å­˜è¿‡ï¼Œå¹¶ä¸”ä¸æ˜¯-1
 							{
 								neigZones.push_back(qContainer);
 							}
 						}
-						if (i + 1 < marks.rows)	 // ×óÉÏ½Ç
+						if (i + 1 < marks.rows)	 // å·¦ä¸Šè§’
 						{
 							qContainer = marks.at<int>(i + 1, j - 1);
 							if (qContainer == -1)
@@ -94,28 +95,27 @@ public:
 								numWshed++;
 							}
 							neigZonesIterator = find(neigZones.begin(), neigZones.end(), qContainer);
-							if ((neigZonesIterator == neigZones.end()) && (qContainer != -1)) //Õâ¸öÏñËØµÄÕâ¸öÁÚÓòµÄÈİÆ÷±êºÅÖµ»¹Ã»±»´æ¹ı£¬²¢ÇÒ²»ÊÇ-1
+							if ((neigZonesIterator == neigZones.end()) && (qContainer != -1)) //è¿™ä¸ªåƒç´ çš„è¿™ä¸ªé‚»åŸŸçš„å®¹å™¨æ ‡å·å€¼è¿˜æ²¡è¢«å­˜è¿‡ï¼Œå¹¶ä¸”ä¸æ˜¯-1
 							{
 								neigZones.push_back(qContainer);
 							}
 						}
 					}
-
-					//ÓÒ
+					//å³
 					if (j + 1 <  marks.cols)
 					{
-						// ÓÒÁÚÓò
+						// å³é‚»åŸŸ
 						qContainer = marks.at<int>(i, j + 1);
 						if (qContainer == -1)
 						{
 							numWshed++;
 						}
 						neigZonesIterator = find(neigZones.begin(), neigZones.end(), qContainer);
-						if ((neigZonesIterator == neigZones.end()) && (qContainer != -1)) //Õâ¸öÏñËØµÄÕâ¸öÁÚÓòµÄÈİÆ÷±êºÅÖµ»¹Ã»±»´æ¹ı£¬²¢ÇÒ²»ÊÇ-1
+						if ((neigZonesIterator == neigZones.end()) && (qContainer != -1)) //è¿™ä¸ªåƒç´ çš„è¿™ä¸ªé‚»åŸŸçš„å®¹å™¨æ ‡å·å€¼è¿˜æ²¡è¢«å­˜è¿‡ï¼Œå¹¶ä¸”ä¸æ˜¯-1
 						{
 							neigZones.push_back(qContainer);
 						}
-						if (i - 1 >= 0)	 // ÓÒÏÂ½Ç
+						if (i - 1 >= 0)	 // å³ä¸‹è§’
 						{
 							qContainer = marks.at<int>(i - 1, j + 1);
 							if (qContainer == -1)
@@ -123,12 +123,12 @@ public:
 								numWshed++;
 							}
 							neigZonesIterator = find(neigZones.begin(), neigZones.end(), qContainer);
-							if ((neigZonesIterator == neigZones.end()) && (qContainer != -1)) //Õâ¸öÏñËØµÄÕâ¸öÁÚÓòµÄÈİÆ÷±êºÅÖµ»¹Ã»±»´æ¹ı£¬²¢ÇÒ²»ÊÇ-1
+							if ((neigZonesIterator == neigZones.end()) && (qContainer != -1)) //è¿™ä¸ªåƒç´ çš„è¿™ä¸ªé‚»åŸŸçš„å®¹å™¨æ ‡å·å€¼è¿˜æ²¡è¢«å­˜è¿‡ï¼Œå¹¶ä¸”ä¸æ˜¯-1
 							{
 								neigZones.push_back(qContainer);
 							}
 						}
-						if (i + 1 < marks.rows) // ÓÒÉÏ½Ç
+						if (i + 1 < marks.rows) // å³ä¸Šè§’
 						{
 							qContainer = marks.at<int>(i + 1, j + 1);
 							if (qContainer == -1)
@@ -136,15 +136,14 @@ public:
 								numWshed++;
 							}
 							neigZonesIterator = find(neigZones.begin(), neigZones.end(), qContainer);
-							if ((neigZonesIterator == neigZones.end()) && (qContainer != -1)) //Õâ¸öÏñËØµÄÕâ¸öÁÚÓòµÄÈİÆ÷±êºÅÖµ»¹Ã»±»´æ¹ı£¬²¢ÇÒ²»ÊÇ-1
+							if ((neigZonesIterator == neigZones.end()) && (qContainer != -1)) //è¿™ä¸ªåƒç´ çš„è¿™ä¸ªé‚»åŸŸçš„å®¹å™¨æ ‡å·å€¼è¿˜æ²¡è¢«å­˜è¿‡ï¼Œå¹¶ä¸”ä¸æ˜¯-1
 							{
 								neigZones.push_back(qContainer);
 							}
 						}
 					}
-
-					//ÉÏÏÂ
-					// ÏÂÁÚÓò
+					//ä¸Šä¸‹
+					// ä¸‹é‚»åŸŸ
 					if (i - 1 >= 0)
 					{
 						qContainer = marks.at<int>(i - 1, j);
@@ -153,12 +152,12 @@ public:
 							numWshed++;
 						}
 						neigZonesIterator = find(neigZones.begin(), neigZones.end(), qContainer);
-						if ((neigZonesIterator == neigZones.end()) && (qContainer != -1)) //Õâ¸öÏñËØµÄÕâ¸öÁÚÓòµÄÈİÆ÷±êºÅÖµ»¹Ã»±»´æ¹ı£¬²¢ÇÒ²»ÊÇ-1
+						if ((neigZonesIterator == neigZones.end()) && (qContainer != -1)) //è¿™ä¸ªåƒç´ çš„è¿™ä¸ªé‚»åŸŸçš„å®¹å™¨æ ‡å·å€¼è¿˜æ²¡è¢«å­˜è¿‡ï¼Œå¹¶ä¸”ä¸æ˜¯-1
 						{
 							neigZones.push_back(qContainer);
 						}
 					}
-					// ÉÏÁÚÓò
+					// ä¸Šé‚»åŸŸ
 					if (i + 1 < marks.rows)
 					{
 						qContainer = marks.at<int>(i + 1, j);
@@ -167,66 +166,61 @@ public:
 							numWshed++;
 						}
 						neigZonesIterator = find(neigZones.begin(), neigZones.end(), qContainer);
-						if ((neigZonesIterator == neigZones.end()) && (qContainer != -1)) //Õâ¸öÏñËØµÄÕâ¸öÁÚÓòµÄÈİÆ÷±êºÅÖµ»¹Ã»±»´æ¹ı£¬²¢ÇÒ²»ÊÇ-1
+						if ((neigZonesIterator == neigZones.end()) && (qContainer != -1)) //è¿™ä¸ªåƒç´ çš„è¿™ä¸ªé‚»åŸŸçš„å®¹å™¨æ ‡å·å€¼è¿˜æ²¡è¢«å­˜è¿‡ï¼Œå¹¶ä¸”ä¸æ˜¯-1
 						{
 							neigZones.push_back(qContainer);
 						}
 					}
-
-
-					if ((numWshed > 0) && (numWshed < 3)) //Èç¹ûÕâ¸öÏñËØµÄÁÚÓòÖĞÖ»ÓĞÒ»¸ö»òÕßÁ½¸öÏñËØÊôÓÚ·ÖË®Áë£¬ËüÁ½²à¿ÉÄÜÊÇÁ½¸ö·Ö¸îÇøÓò
+					if ((numWshed > 0) && (numWshed < 3)) //å¦‚æœè¿™ä¸ªåƒç´ çš„é‚»åŸŸä¸­åªæœ‰ä¸€ä¸ªæˆ–è€…ä¸¤ä¸ªåƒç´ å±äºåˆ†æ°´å²­ï¼Œå®ƒä¸¤ä¾§å¯èƒ½æ˜¯ä¸¤ä¸ªåˆ†å‰²åŒºåŸŸ
 					{
-						if (neigZones.size() == 2) //Èç¹ûÕâ¸öÏñËØµÄÁÚÓòÖĞÓĞÇÒ½öÓĞÁ½¸ö¹éÊô·Ö¸îÇøÓò
+						if (neigZones.size() == 2) //å¦‚æœè¿™ä¸ªåƒç´ çš„é‚»åŸŸä¸­æœ‰ä¸”ä»…æœ‰ä¸¤ä¸ªå½’å±åˆ†å‰²åŒºåŸŸ
 						{
 							container0 = neigZones.at(0);
 							container1 = neigZones.at(1);
 							int test0 = 0;
 							int test1 = 0;
-
-							// »¥ÏàÌí¼ÓÁÚ½Ó¹ØÏµ£¬relationship[container0]±íÊ¾ÇøÓò±êºÅÎªcontainer0µÄ·Ö¸îÇøÓòµÄÁÚ½ÓÇøÓòÃÇµÄ¼¯ºÏ
-							//ĞÂ¸Ä¶¯2017Äê3ÔÂ30ÈÕ 18:12:31 µ±Ç°Õâ¸öµãÊÇ·ÖË®Áëµã£¬Á½²àÊÇÁ½¸öÇøÓò£¬ÕâÁ½¸öÇøÓòÖÜ³¤+1
+							//äº’ç›¸æ·»åŠ é‚»æ¥å…³ç³»ï¼Œrelationship[container0]è¡¨ç¤ºåŒºåŸŸæ ‡å·ä¸ºcontainer0çš„åˆ†å‰²åŒºåŸŸçš„é‚»æ¥åŒºåŸŸä»¬çš„é›†åˆ
+							//å½“å‰è¿™ä¸ªç‚¹æ˜¯åˆ†æ°´å²­ç‚¹ï¼Œä¸¤ä¾§æ˜¯ä¸¤ä¸ªåŒºåŸŸï¼Œè¿™ä¸¤ä¸ªåŒºåŸŸå‘¨é•¿+1
 							relationMatrix[container0].at(5) = relationMatrix[container0].at(5) + float(1);
 							relationMatrix[container1].at(5) = relationMatrix[container0].at(5) + float(1);
-
-							if (relationMatrix[container0].size() == persize) //Õâ¸ö[container0 - 1]ÏòÁ¿»¹Ã»Ìí¼Ó¹ıÁÚÓòĞÅÏ¢//ĞÂ¸Ä¶¯2017Äê3ÔÂ29ÈÕ 23:34:35 5->7
+							if (relationMatrix[container0].size() == persize) //è¿™ä¸ª[container0 - 1]å‘é‡è¿˜æ²¡æ·»åŠ è¿‡é‚»åŸŸä¿¡æ¯
 							{
-								relationMatrix[container0].push_back(float(container1)); //¼ÇÂ¼Õâ¸öĞÂµÄÁÚÓò±êºÅ
-								relationMatrix[container0].at(0) = relationMatrix[container0].at(0) + float(1); //ÁÚÓò¸öÊı+1
+								relationMatrix[container0].push_back(float(container1)); //è®°å½•è¿™ä¸ªæ–°çš„é‚»åŸŸæ ‡å·
+								relationMatrix[container0].at(0) = relationMatrix[container0].at(0) + float(1); //é‚»åŸŸä¸ªæ•°+1
 							}
-							else if (relationMatrix[container0].size() > persize) //Õâ¸öÏòÁ¿Ìí¼Ó¹ıÁÚÓòĞÅÏ¢//ĞÂ¸Ä¶¯2017Äê3ÔÂ29ÈÕ 23:34:44 5->7
+							else if (relationMatrix[container0].size() > persize) //è¿™ä¸ªå‘é‡æ·»åŠ è¿‡é‚»åŸŸä¿¡æ¯
 							{
-								for (int k = persize; k < relationMatrix[container0].size(); ++k) //´ÓµÚÁùÎ»¿ªÊ¼±éÀú//ĞÂ¸Ä¶¯2017Äê3ÔÂ29ÈÕ 23:35:28 Áù->°Ë
+								for (int k = persize; k < relationMatrix[container0].size(); ++k) //ä»ç¬¬å…­ä½å¼€å§‹éå†
 								{
-									if (relationMatrix[container0].at(k) == float(container1)) //ÓĞÏàÍ¬µÄ£¬Ìø³ö
+									if (relationMatrix[container0].at(k) == float(container1)) //æœ‰ç›¸åŒçš„ï¼Œè·³å‡º
 									{
 										break;
 									}
-									else if (k == relationMatrix[container0].size() - 1) //µ½µ×£¬Ã»ÏàÍ¬µÄ£¬²åÈë
+									else if (k == relationMatrix[container0].size() - 1) //åˆ°åº•ï¼Œæ²¡ç›¸åŒçš„ï¼Œæ’å…¥
 									{
-										relationMatrix[container0].push_back(float(container1)); //¼ÇÂ¼Õâ¸öĞÂµÄÁÚÓò±êºÅ
-										relationMatrix[container0].at(0) = relationMatrix[container0].at(0) + float(1); //ÁÚÓò¸öÊı+1
+										relationMatrix[container0].push_back(float(container1)); //è®°å½•è¿™ä¸ªæ–°çš„é‚»åŸŸæ ‡å·
+										relationMatrix[container0].at(0) = relationMatrix[container0].at(0) + float(1); //é‚»åŸŸä¸ªæ•°+1
 										break;
 									}
 								}
 							}
-
-							if (relationMatrix[container1].size() == persize) //Õâ¸ö[container1 - 1]ÏòÁ¿»¹Ã»Ìí¼Ó¹ıÁÚÓòĞÅÏ¢//ĞÂ¸Ä¶¯2017Äê3ÔÂ29ÈÕ 23:45:12 5->7
+							if (relationMatrix[container1].size() == persize) //è¿™ä¸ª[container1 - 1]å‘é‡è¿˜æ²¡æ·»åŠ è¿‡é‚»åŸŸä¿¡æ¯
 							{
-								relationMatrix[container1].push_back(float(container0)); //¼ÇÂ¼Õâ¸öĞÂµÄÁÚÓò±êºÅ
-								relationMatrix[container1].at(0) = relationMatrix[container1].at(0) + float(1); //ÁÚÓò¸öÊı+1
+								relationMatrix[container1].push_back(float(container0)); //è®°å½•è¿™ä¸ªæ–°çš„é‚»åŸŸæ ‡å·
+								relationMatrix[container1].at(0) = relationMatrix[container1].at(0) + float(1); //é‚»åŸŸä¸ªæ•°+1
 							}
-							else if (relationMatrix[container1].size() > persize) //Õâ¸öÏòÁ¿Ìí¼Ó¹ıÁÚÓòĞÅÏ¢//ĞÂ¸Ä¶¯2017Äê3ÔÂ29ÈÕ 23:46:02 5->7
+							else if (relationMatrix[container1].size() > persize) //è¿™ä¸ªå‘é‡æ·»åŠ è¿‡é‚»åŸŸä¿¡æ¯
 							{
-								for (int k = persize; k < relationMatrix[container1].size(); ++k) //´ÓµÚÁùÎ»¿ªÊ¼±éÀú//ĞÂ¸Ä¶¯2017Äê3ÔÂ29ÈÕ 23:46:02 5->7
+								for (int k = persize; k < relationMatrix[container1].size(); ++k) //ä»ç¬¬å…­ä½å¼€å§‹éå†
 								{
-									if (relationMatrix[container1].at(k) == float(container0)) //ÓĞÏàÍ¬µÄ£¬Ìø³ö
+									if (relationMatrix[container1].at(k) == float(container0)) //æœ‰ç›¸åŒçš„ï¼Œè·³å‡º
 									{
 										break;
 									}
-									else if (k == relationMatrix[container1].size() - 1) //µ½µ×£¬Ã»ÏàÍ¬µÄ£¬²åÈë
+									else if (k == relationMatrix[container1].size() - 1) //åˆ°åº•ï¼Œæ²¡ç›¸åŒçš„ï¼Œæ’å…¥
 									{
-										relationMatrix[container1].push_back(float(container0)); //¼ÇÂ¼Õâ¸öĞÂµÄÁÚÓò±êºÅ
-										relationMatrix[container1].at(0) = relationMatrix[container1].at(0) + float(1); //ÁÚÓò¸öÊı+1
+										relationMatrix[container1].push_back(float(container0)); //è®°å½•è¿™ä¸ªæ–°çš„é‚»åŸŸæ ‡å·
+										relationMatrix[container1].at(0) = relationMatrix[container1].at(0) + float(1); //é‚»åŸŸä¸ªæ•°+1
 										break;
 									}
 								}
@@ -238,8 +232,8 @@ public:
 		}
 	}
 
-	//¼ÆËãÇøÓòHS¾ùÖµ
-	//Õâ¸ö·½·¨×î¶àÖ»ÓÃÒ»´Î
+	//è®¡ç®—åŒºåŸŸHSå‡å€¼
+	//è¿™ä¸ªæ–¹æ³•æœ€å¤šåªç”¨ä¸€æ¬¡
 	void CountHSAverage(float **hMatrix, float **sMatrix)
 	{
 		for (int i = 0; i < marks.rows; i++)
@@ -257,10 +251,10 @@ public:
 				}
 			}
 		}
-		//¼ÆËãÉ«µ÷±¥ºÍ¶È¾ùÖµ
+		//è®¡ç®—è‰²è°ƒé¥±å’Œåº¦å‡å€¼
 		for (int i = 0; i < maxCounter + 1; ++i)
 		{
-			if (relationMatrix[i].size() != persize)//ĞÂ¸Ä¶¯2017Äê3ÔÂ29ÈÕ 23:46:02 5->7
+			if (relationMatrix[i].size() != persize)
 			{
 				relationMatrix[i].at(1) = relationMatrix[i].at(1) / relationMatrix[i].at(3);
 				relationMatrix[i].at(2) = relationMatrix[i].at(2) / relationMatrix[i].at(3);
@@ -268,13 +262,13 @@ public:
 		}
 	}
 
-	//·µ»Ø¹ØÏµ¾ØÕórelationMatrix
+	//è¿”å›å…³ç³»çŸ©é˜µrelationMatrix
 	vector<float> * getRelationMatrix()
 	{
 		return relationMatrix;
 	}
 
-	//ĞÂ¸Ä¶¯2017Äê3ÔÂ30ÈÕ 19:04:01 ¸ù¾İÇøÓòsizeÉèÖÃban
+	//æ ¹æ®åŒºåŸŸsizeè®¾ç½®ban
 	void setBanforSize()
 	{
 		for (int i = 0; i < maxCounter + 1; ++i)
@@ -286,7 +280,7 @@ public:
 		}
 	}
 
-	//·µ»Ø¾ØÕómarks
+	//è¿”å›çŸ©é˜µmarks
 	Mat getMarks()
 	{
 		return marks;

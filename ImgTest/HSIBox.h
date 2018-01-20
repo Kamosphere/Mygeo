@@ -1,4 +1,4 @@
-
+ï»¿
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include<iostream>
@@ -17,9 +17,9 @@ using namespace cv;
 class HSIBox
 {
 private:
-	//IplImage* ÀàĞÍµÄÔ´Í¼ÏñIplImage_src£¬ÓÃÓÚµÃµ½ÆäHSI
+	//IplImage* ç±»å‹çš„æºå›¾åƒIplImage_srcï¼Œç”¨äºå¾—åˆ°å…¶HSI
 	IplImage* IplImage_src;
-	//´æÉ«µ÷µÄfloat¾ØÕó£¬hMatrix[y][x]£¬x¶ÔÓ¦width£¬y¶ÔÓ¦height
+	//å­˜è‰²è°ƒçš„floatçŸ©é˜µï¼ŒhMatrix[y][x]ï¼Œxå¯¹åº”widthï¼Œyå¯¹åº”height
 	float **hMatrix;
 	float **sMatrix;
 public:
@@ -27,7 +27,7 @@ public:
 	{
 		IplImage_src = &IplImage(input);
 
-		//HºÍS¾ØÕó³õÊ¼»¯
+		//Hå’ŒSçŸ©é˜µåˆå§‹åŒ–
 		hMatrix = new float*[IplImage_src->height];
 		for (int i = 0; i < IplImage_src->height; ++i)
 		{
@@ -39,19 +39,19 @@ public:
 			sMatrix[i] = new float[IplImage_src->width];
 		}
 
-		//¼ÆËãH¾ØÕóS¾ØÕó
-		// Ô­Ê¼Í¼ÏñÊı¾İÖ¸Õë, HSI¾ØÕóÊı¾İÖ¸Õë
+		//è®¡ç®—HçŸ©é˜µSçŸ©é˜µ
+		//åŸå§‹å›¾åƒæ•°æ®æŒ‡é’ˆ, HSIçŸ©é˜µæ•°æ®æŒ‡é’ˆ
 		uchar* data;
 
-		// rgb·ÖÁ¿
+		// rgbåˆ†é‡
 		float img_r, img_g, img_b;
-		float min_rgb;  // rgb·ÖÁ¿ÖĞµÄ×îĞ¡Öµ
-		// HSI·ÖÁ¿
+		float min_rgb;  // rgbåˆ†é‡ä¸­çš„æœ€å°å€¼
+		// HSIåˆ†é‡
 		float fHue, fSaturation, fIntensity, fSaturation_show, fIntensity_show;
 
-		for (int i = 0; i < IplImage_src->height; i++) //¶ÔÓ¦y
+		for (int i = 0; i < IplImage_src->height; i++) //å¯¹åº”y
 		{
-			for (int j = 0; j < IplImage_src->width; j++) //¶ÔÓ¦x
+			for (int j = 0; j < IplImage_src->width; j++) //å¯¹åº”x
 			{
 				data = cvPtr2D(IplImage_src, i, j, 0);
 				img_b = *data;
@@ -60,14 +60,14 @@ public:
 				data++;
 				img_r = *data;
 
-				// Intensity·ÖÁ¿[0, 1]
+				// Intensityåˆ†é‡[0, 1]
 				fIntensity = (float)((img_b + img_g + img_r) / 3) / 255;
 				fIntensity_show = (float)((img_b + img_g + img_r) / 3);
 
-				// µÃµ½RGB·ÖÁ¿ÖĞµÄ×îĞ¡Öµ
+				// å¾—åˆ°RGBåˆ†é‡ä¸­çš„æœ€å°å€¼
 				float fTemp = img_r < img_g ? img_r : img_g;
 				min_rgb = fTemp < img_b ? fTemp : img_b;
-				// Saturation·ÖÁ¿[0, 1]
+				// Saturationåˆ†é‡[0, 1]
 				if (img_r + img_g + img_b == 0)
 				{
 					fSaturation = 0;
@@ -77,12 +77,12 @@ public:
 					fSaturation = 1 - (float)(3 * min_rgb) / (img_r + img_g + img_b);
 				}
 
-				// ¼ÆËãtheta½Ç
+				// è®¡ç®—thetaè§’
 				float numerator = (img_r - img_g + img_r - img_b) / 2;
 				float denominator = sqrt(
 					pow((img_r - img_g), 2) + (img_r - img_b)*(img_g - img_b));
 
-				// ¼ÆËãHue·ÖÁ¿
+				// è®¡ç®—Hueåˆ†é‡
 				if (denominator != 0)
 				{
 					float theta = acos(numerator / denominator)  / (2*3.14);
@@ -106,7 +106,7 @@ public:
 		}
 	}
 
-	//·µ»ØÍ¼ÏñÖĞ(x,y)´¦HSĞÅÏ¢
+	//è¿”å›å›¾åƒä¸­(x,y)å¤„HSä¿¡æ¯
 	float getH(int x, int y)
 	{
 		return hMatrix[y][x];
@@ -117,7 +117,7 @@ public:
 		return sMatrix[y][x];
 	}
 
-	//·µ»ØHS¾ØÕó
+	//è¿”å›HSçŸ©é˜µ
 	float **getHMatrix()
 	{
 		return hMatrix;

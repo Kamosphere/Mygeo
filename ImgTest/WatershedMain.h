@@ -1,12 +1,8 @@
-﻿
-/*
-* 分水岭算法主函数
-*/
-
-#include<string>
+﻿#include<string>
 #include<stdlib.h>
 #include<stdio.h>
 #include<iostream>
+#include<fstream>
 #include<thread>
 
 #include"HSIBox.h"
@@ -29,15 +25,22 @@ inline bool sw_ordering(const std::pair<double, double> a, const std::pair<doubl
 class WatershedMain{
 private:
 	Mat sourceFile;
-	//Mat temp;
 public:
-
 	WatershedMain(Mat Q){
 		sourceFile = Q.clone();
 	}
 
-//OPENCV二值化图像内孔洞填充 / 小区域去除
-//CheckMode: 0代表去除黑区域，1代表去除白区域; NeihborMode：0代表4邻域，1代表8邻域;  
+/*
+OPENCV二值化图像内孔洞填充 / 小区域去除
+输入：
+Mat& Src：源文件
+Mat& Dst：目的文件
+int AreaLimit：区域大小限制
+int CheckMode：0代表去除黑区域，1代表去除白区域
+int NeihborMode：0代表4邻域，1代表8邻域
+输出：
+Mat& Dst：目的文件
+*/
 void RemoveSmallRegion(Mat& Src, Mat& Dst, int AreaLimit, int CheckMode, int NeihborMode)
 {
 	int RemoveCount = 0;       //记录除去的个数
@@ -85,13 +88,12 @@ void RemoveSmallRegion(Mat& Src, Mat& Dst, int AreaLimit, int CheckMode, int Nei
 	NeihborPos.push_back(Point2i(0, 1));
 	if (NeihborMode == 1)
 	{
-		//cout << "Neighbor mode: 8邻域." << endl;
 		NeihborPos.push_back(Point2i(-1, -1));
 		NeihborPos.push_back(Point2i(-1, 1));
 		NeihborPos.push_back(Point2i(1, -1));
 		NeihborPos.push_back(Point2i(1, 1));
 	}
-	else{} //cout << "Neighbor mode: 4邻域." << endl;
+	else{} 
 	int NeihborCount = 4 + 4 * NeihborMode;
 	int CurrX = 0, CurrY = 0;
 	//开始检测  
@@ -135,8 +137,6 @@ void RemoveSmallRegion(Mat& Src, Mat& Dst, int AreaLimit, int CheckMode, int Nei
 					Pointlabel.at<uchar>(CurrY, CurrX) += CheckResult;
 				}
 				//********结束该点处的检查**********  
-
-
 			}
 		}
 	}
@@ -161,15 +161,21 @@ void RemoveSmallRegion(Mat& Src, Mat& Dst, int AreaLimit, int CheckMode, int Nei
 		}
 	}
 
-	//cout << RemoveCount << " objects removed." << endl;
-
-	//cout << BlackCount << " objects left." << endl;
+	cout << RemoveCount << " regions moved" << endl;
+	cout << BlackCount << " regions saved" << endl;
 }
 
-
-//去除二值图像边缘的突出部  
-//uthreshold、vthreshold分别表示突出部的宽度阈值和高度阈值  
-//type代表突出部的颜色，0表示黑色，1代表白色   
+/*
+去除二值图像边缘的突出部
+输入：
+Mat& Src：源文件
+Mat& Dst：目的文件
+int uthreshold：突出部的宽度阈值
+int vthreshold：突出部的高度阈值
+int type：突出部的颜色，0表示黑色，1代表白色
+输出：
+Mat& Dst：目的文件
+*/
 void delete_jut(Mat& src, Mat& dst, int uthreshold, int vthreshold, int type)
 {
 	int threshold;
@@ -276,9 +282,16 @@ void delete_jut(Mat& src, Mat& dst, int uthreshold, int vthreshold, int type)
 	}
 }
 
-
-//图片边缘光滑处理  
-//size表示取均值的窗口大小，threshold表示对均值图像进行二值化的阈值  
+/*
+图片边缘光滑处理
+输入：
+Mat& Src：源文件
+Mat& Dst：目的文件
+Size size：取均值的窗口大小
+int threshold：对均值图像进行二值化的阈值
+输出：
+Mat& Dst：目的文件
+*/
 void imageblur(Mat& src, Mat& dst, Size size, int threshold)
 {
 	int height = src.rows;
@@ -296,7 +309,14 @@ void imageblur(Mat& src, Mat& dst, Size size, int threshold)
 	}
 }
 
-Vec3b RandomColor(int value)    //生成随机颜色函数</span>
+/*
+生成随机颜色函数
+输入：
+int value：任意随机数
+输出：
+Vec3b：某个RGB颜色
+*/
+Vec3b RandomColor(int value)    //
 {
 	value = value % 255;  //生成0~255的随机数
 	RNG rng;
@@ -306,9 +326,17 @@ Vec3b RandomColor(int value)    //生成随机颜色函数</span>
 	return Vec3b(aa, bb, cc);
 }
 
-vector<pair<float, float>> seedAreaParaCal(vector<float> *BBmatrix, int areaCount) //由区域关系矩阵计算参数矩阵
+/*
+由区域关系矩阵计算参数矩阵
+输入：
+vector<float> *BBmatrix：区域关系矩阵
+int areaCount：区域总数
+输出：
+vector<pair<float, float>> AutoMatrix：参数矩阵，[0]:相似度 [1]：相对欧氏距离
+*/
+vector<pair<float, float>> seedAreaParaCal(vector<float> *BBmatrix, int areaCount) 
 {
-	vector<pair<float, float>> AutoMatrix;//[0]:相似度 [1]：相对欧氏距离
+	vector<pair<float, float>> AutoMatrix;
 	const int neinVar = 7;//向量常数位persize
 	vector<float> tempNeiHueArea;//邻接区域色调分量temp
 	vector<float> tempNeiSatArea;//邻接区域饱和度分量temp
@@ -319,8 +347,7 @@ vector<pair<float, float>> seedAreaParaCal(vector<float> *BBmatrix, int areaCoun
 	{
 		int neiArea = (int)BBmatrix[i][0];//邻接区域个数
 		if (neiArea == 0 && BBmatrix[i][6] != 1){
-			//cout << i << " no相似度 " << " no最大欧氏距离 " << endl;
-
+			cout << i << " no similarity " << " no maxinum Ds " << endl;
 		}
 		else{
 			tempNeiHueArea.resize(neiArea);
@@ -334,11 +361,9 @@ vector<pair<float, float>> seedAreaParaCal(vector<float> *BBmatrix, int areaCoun
 				avgh = avgh + tempNeiHueArea[j];
 				tempNeiSatArea[j] = BBmatrix[ArealistTemp][2];
 				avgs = avgs + tempNeiSatArea[j];
-				//cout << i << " " << ArealistTemp << " " << tempNeiHueArea[j] << " " << tempNeiSatArea[j] << endl;
 			}
 			avgh = (avgh + BBmatrix[i][1]) / (neiArea + 1);
 			avgs = (avgs + BBmatrix[i][2]) / (neiArea + 1);
-			//cout << i << " " << AutoMatrix[i][0] << endl;
 			//计算相似度和欧氏距离
 			float similar = 0, DsMaxtemp = 0;//相似度,最大欧氏距离
 			for (int j = 0; j < neiArea; j++)
@@ -350,7 +375,6 @@ vector<pair<float, float>> seedAreaParaCal(vector<float> *BBmatrix, int areaCoun
 				if (tempNeiHueArea[j] == 0)
 					Ds[j] = 0;
 				else Ds[j] = abs((tempNeiHueArea[j] - avgh) / tempNeiHueArea[j]);
-				//cout << i << " " << Ds[j] << endl;
 
 				if (Ds[j]>DsMaxtemp)
 				{
@@ -360,14 +384,21 @@ vector<pair<float, float>> seedAreaParaCal(vector<float> *BBmatrix, int areaCoun
 			simh = sqrt(simh / neiArea + 1);
 			sims = sqrt(sims / neiArea + 1);
 			similar = 0.8*simh + 0.2*sims;
-			//cout << i << " 相似度 " << similar << " 最大欧氏距离 " << DsMaxtemp << endl;
+			cout << i << " similarity  " << similar << " maximum Ds " << DsMaxtemp << endl;
 			AutoMatrix.push_back(pair<float, float>(similar, DsMaxtemp));
 		}
-
 	}
 	return AutoMatrix;
 }
-double similarOtsu(vector<pair<float, float>> AutoMatrix){//大津思想求阈值
+
+/*
+大津思想求阈值
+输入：
+vector<pair<float, float>> AutoMatrix：参数矩阵，[0]:相似度 [1]：相对欧氏距离
+输出：
+double threshold：阈值
+*/
+double similarOtsu(vector<pair<float, float>> AutoMatrix){
 	int areaCount = AutoMatrix.size();
 	vector<float> pixelPro(areaCount, -1);
 	vector<int> pixelCount(areaCount, -1);
@@ -391,7 +422,6 @@ double similarOtsu(vector<pair<float, float>> AutoMatrix){//大津思想求阈�
 			}
 			pixelPro[a] = ((double)pixelCount[a] + 1) / areaCount;
 		}
-		//cout << a << " " << pixelPro[a] << " " << pixelCount[a] << endl;
 	}
 
 	//遍历相似度,寻找合适的threshold
@@ -424,22 +454,26 @@ double similarOtsu(vector<pair<float, float>> AutoMatrix){//大津思想求阈�
 		if (deltaTmp > deltaMax)
 		{
 			deltaMax = deltaTmp;
-			//cout << deltaMax << " is zuida" << endl;
 			threshold = j;
-			//cout << threshold << " is zuida" << endl;
 		}
 	}
 	return threshold;
 }
 
-
-
+/*
+对区域进行合并
+输入：
+vector<float> *BBmatrix：区域关系矩阵
+int jointedAreaNum：被合并的区域标号
+int targetAreaSeedNum：合并主体的区域标号
+输出：
+vector<float> *BBmatrix：区域关系矩阵
+*/
 void addMarkToSubTempArea(int jointedAreaNum, int targetAreaSeedNum, vector<float> *BBmatrix){
 	const int neinVar = 7;//向量常数位persize
 	if (BBmatrix[jointedAreaNum][0] >= 0 && BBmatrix[targetAreaSeedNum][0] >= 0 && BBmatrix[jointedAreaNum][6] != 1 && BBmatrix[targetAreaSeedNum][6] != 1){//约定不被合并过的区域一定为正的
 		vector<float> jointArea;
 		vector<float> targetArea;
-		//cout << jointedAreaNum << " " << BBmatrix[jointedAreaNum][4] << "combined with" << targetAreaSeedNum << " " << BBmatrix[targetAreaSeedNum][4] << endl;
 		//取得两个区域的邻接区域列表 以用来去重
 		for (int i = 0; i<BBmatrix[jointedAreaNum][0]; i++){
 			if (BBmatrix[jointedAreaNum][i + neinVar] != targetAreaSeedNum)
@@ -460,10 +494,8 @@ void addMarkToSubTempArea(int jointedAreaNum, int targetAreaSeedNum, vector<floa
 			else
 				it++;
 		}
-
 		//计算参数
 		//第一位（at(0)）存储邻域个数，第二位（at(1)）存储色调（H）均值，第三位（at(2)）存储饱和度（S）均值，第四位（at(3)）存储区域内像素个数，第五位（at(4)）存储标号位
-
 		float newAreaPara[5];
 		newAreaPara[0] = BBmatrix[targetAreaSeedNum].size() - neinVar;
 		newAreaPara[3] = BBmatrix[targetAreaSeedNum][3] + BBmatrix[jointedAreaNum][3];
@@ -484,16 +516,24 @@ void addMarkToSubTempArea(int jointedAreaNum, int targetAreaSeedNum, vector<floa
 		BBmatrix[targetAreaSeedNum][2] = newAreaPara[2];
 		BBmatrix[targetAreaSeedNum][3] = newAreaPara[3];
 		BBmatrix[targetAreaSeedNum][4] = newAreaPara[4];
-	
-
 	}
 }
 
-
-//向量第一位（at(0)）存储邻域个数，第二位（at(1)）存储色调（H）均值，第三位（at(2)）存储饱和度（S）均值，第四位（at(3)）存储区域内像素个数，第五位（at(4)）存储标号位，第六位（at(5)）存储周长，第七位（at(6)）存储ban，之后存储邻域们的区域标号
-//第七位ban位取值： 0（默认）--不ban，1--ban，被判定为肯定不是房屋
-vector<int> regionalGrowth(vector<float> *BBmatrix, int areaCount, int realAreaCount, int SUM){
-	//矩阵，总区域数，有效区域数，总图像像素数,屏蔽区域
+/*
+对区域进行合并
+输入：
+vector<float> *BBmatrix：区域关系矩阵，其中：
+第一位（at(0)）存储邻域个数，第二位（at(1)）存储色调（H）均值，
+第三位（at(2)）存储饱和度（S）均值，第四位（at(3)）存储区域内像素个数，
+第五位（at(4)）存储标号位，第六位（at(5)）存储周长，
+第七位（at(6)）存储ban，0（默认）--不ban、1--ban、被判定为肯定不是房屋，之后存储邻域们的区域标号
+int areaCount：所有区域数
+int realAreaCount：实际区域数（对角黑块和ban区域去除）
+int sumPixelSize：图像总像素数（暂时未用）
+输出：
+vector<int> seedArea：区域合并后的矩阵
+*/
+vector<int> regionalGrowth(vector<float> *BBmatrix, int areaCount, int realAreaCount, int sumPixelSize){
 	const int neinVar = 7;//向量常数位persize
 	vector<pair<float, float>> AutoMatrix = seedAreaParaCal(BBmatrix, areaCount);
 	float threshold = similarOtsu(AutoMatrix);
@@ -506,10 +546,9 @@ vector<int> regionalGrowth(vector<float> *BBmatrix, int areaCount, int realAreaC
 			//cout << seedCount << endl;
 			seedCount++;
 		}
-
 	}
 	for (int i = 0; i < seedArea.size(); i++){
-		//cout << seedArea.at(i) << " is seed" << endl;
+		cout << seedArea.at(i) << " is seed" << endl;
 	}
 
 	//区域生长
@@ -551,7 +590,7 @@ vector<int> regionalGrowth(vector<float> *BBmatrix, int areaCount, int realAreaC
 					if (markedAreaVari.size() == 1){//标记过的区域 标记全相同
 						int labelNum = (int)seedArea[markedAreaVari[0] - 1];
 						if (abs(BBmatrix[labelNum][1] - BBmatrix[subTempArea][1])<0.02){
-							//cout << markedAreaVari[0] << "独一区域 " << endl;
+							//cout << markedAreaVari[0] << "unique region " << endl;
 							addMarkToSubTempArea( subTempArea, seedArea[markedAreaVari[0] - 1], BBmatrix);//一个将subTempArea添加到seedArea[i]的函数
 						}
 
@@ -567,12 +606,10 @@ vector<int> regionalGrowth(vector<float> *BBmatrix, int areaCount, int realAreaC
 							}
 						}
 						if (minAreaHue < 0.02){
-							//cout << bestAreaAdd << "最佳区域 " << endl;
 							addMarkToSubTempArea(subTempArea, seedArea[bestAreaAdd - 1], BBmatrix);//种子区域的序号；被添加的区域序号；添加入的种子区域序号，区域关系矩阵
 						}
 					}
 					neiArea = (int)BBmatrix[seedTemp][0];//重新获得邻接区域个数
-					//cout << neiArea << "重新获取 " << endl;
 				}
 			}
 		}
@@ -600,7 +637,6 @@ vector<int> regionalGrowth(vector<float> *BBmatrix, int areaCount, int realAreaC
 			int subTempArea = (int)BBmatrix[seedTemp][neinVar + j];//seedtemp中的邻接区域之一subTempArea
 			if (BBmatrix[subTempArea][0] > 0 && neiArea > 0 && BBmatrix[subTempArea][6] != 1){//约定不被合并过的区域一定为正的
 				if (abs(BBmatrix[seedTemp][1] - BBmatrix[subTempArea][1])<0.04&&abs(BBmatrix[seedTemp][2] - BBmatrix[subTempArea][2])<0.05){
-					//cout << " complete joint " << endl;
 					addMarkToSubTempArea( subTempArea, seedTemp, BBmatrix);//种子区域的序号；被添加的区域序号；添加入的种子区域序号，区域关系矩阵
 				}
 			}
@@ -609,7 +645,7 @@ vector<int> regionalGrowth(vector<float> *BBmatrix, int areaCount, int realAreaC
 	}
 
 	for (int i = 0; i<areaCount; i++){
-		if (BBmatrix[i][0]>0 && BBmatrix[i][3]<150){//大于零保证其没有被合并，小于SUM/150（需定义或传参）保证足够小
+		if (BBmatrix[i][0]>0 && BBmatrix[i][3]<150){//大于零保证其没有被合并，小于sumPixelSize/150（需定义或传参）保证足够小
 			int neiArea = (int)BBmatrix[i][0];
 			int minHue = 65535;
 			int bestAreaAdd = -1;
@@ -627,21 +663,12 @@ vector<int> regionalGrowth(vector<float> *BBmatrix, int areaCount, int realAreaC
 				}
 			}
 			if (bestAreaAdd != -1){
-				//cout << " small area " << endl;
 				addMarkToSubTempArea( i, bestAreaAdd, BBmatrix);
 			}
 		}
 	}
 
-	/*输出合并后信息
-	for (int i = 0; i < areaCount; i++)
-	{
-		cout << "container " << i  << " : ";
-		for (int j = 0; j < BBmatrix[i].size(); j++)
-			cout << BBmatrix[i].at(j) << ' ';
-		cout << endl;
-		//cout << AutoMatrix[i][0] << " " << "is para" << endl;
-	}
+	//输出合并后信息
 	int ii=0,jj = 0;
 	for (int i = 0; i < areaCount; i++)
 	{
@@ -665,7 +692,7 @@ vector<int> regionalGrowth(vector<float> *BBmatrix, int areaCount, int realAreaC
 		}
 	}
 	cout << jj << "'s core " << threshold << endl;
-	cout << seedCount-1 << "个种子" << endl;
+	cout << seedCount-1 << " seeds" << endl;
 	for (int i = 0; i < areaCount; i++)
 	{
 		if (BBmatrix[i][6]==1){
@@ -675,13 +702,492 @@ vector<int> regionalGrowth(vector<float> *BBmatrix, int areaCount, int realAreaC
 				cout << BBmatrix[i].at(j) << ' ';
 			cout << endl;
 		}
-	}*/
+	}
 	return seedArea;
 }
 
-int mainMethod()
+/*
+得到sobel轮廓，并对该轮廓二值化、去除小斑块
+输入：
+Mat Src：meanshift处理后的一个Mat
+输出：
+写入磁盘BSobel0503_Dwhite_35.jpg
+return：
+marks：二值化sobel轮廓，并且已经去除了像素小于35的轮廓，内容等同BSobel0503_Dwhite_35.jpg
+*/
+Mat Sobel_Contour(Mat Src)
 {
-	//clock_t start_time = clock();
+	Mat dst_x, dst_y;
+	Mat imageGray;
+
+	Sobel(Src, dst_x, Src.depth(), 1, 0); //X方向梯度
+	Sobel(Src, dst_y, Src.depth(), 0, 1); //Y方向梯度
+
+	convertScaleAbs(dst_x, dst_x);
+	convertScaleAbs(dst_y, dst_y);
+
+	addWeighted(dst_x, 0.5, dst_y, 0.5, 0, imageGray);//合并梯度(近似)
+
+	Mat marks(Src.size(), 0);   //Opencv分水岭第二个矩阵参数
+	for (int i = 0; i < imageGray.rows; i++)
+	{
+		for (int j = 0; j < imageGray.cols; j++)
+		{
+			uchar index = imageGray.at<uchar>(i, j);
+			if ((int)index > 25)
+			{
+				marks.at<uchar>(i, j) = 255;
+			}
+
+		}
+	}
+	//此处调用去除小斑块填充空洞函数，去黑阀值0，去白阀值35
+	RemoveSmallRegion(marks, marks, 0, 0, 1);//去除黑
+	RemoveSmallRegion(marks, marks, 35, 1, 0);//去除白
+
+	imwrite("BSobel0503_Dwhite_35.jpg", marks);
+	return marks;
+}
+
+/*
+实现jpg与png叠加的函数
+输入：
+Mat& Src：源文件
+Mat& Dst：目的文件
+double scale：尺度
+输出：
+Mat& Dst：目的文件
+*/
+//
+int cvAdd4cMat_q(cv::Mat &Dst, cv::Mat &Src, double scale)
+{
+	if (Dst.channels() != 3 || Src.channels() != 4)
+	{
+		return true;
+	}
+	if (scale < 0.01)
+		return false;
+	std::vector<cv::Mat>scr_channels;
+	std::vector<cv::Mat>dstt_channels;
+	split(Src, scr_channels);
+	split(Dst, dstt_channels);
+	CV_Assert(scr_channels.size() == 4 && dstt_channels.size() == 3);
+
+	if (scale < 1)
+	{
+		scr_channels[3] *= scale;
+		scale = 1;
+	}
+	for (int i = 0; i < 3; i++)
+	{
+		dstt_channels[i] = dstt_channels[i].mul(255.0 / scale - scr_channels[3], scale / 255.0);
+		dstt_channels[i] += scr_channels[i].mul(scr_channels[3], scale / 255.0);
+	}
+	merge(dstt_channels, Dst);
+	return true;
+}
+
+/*
+按hu的原理5*5拟合边缘
+输入：
+Mat smooth：之前步骤中对提取结果进行平滑，去除阀值为3000的黑色斑块，填充阀值为50的白色空洞的Mat
+输出：
+写入磁盘Hu _smooth_5.jpg.jpg
+return：
+Operating_smooth：5*5边缘拟合后的Mat，内容等同Hu _smooth_5.jpg.jpg
+*/
+Mat Hu_Smooth(Mat smooth)
+{
+	Mat Operating_smooth;
+	convertScaleAbs(smooth, Operating_smooth);
+
+	uchar smooth_p = 0;
+	uchar operating_p = 0;
+
+	for (int i = 0; i < smooth.rows; i++)
+	{
+		for (int j = 0; j < smooth.cols; j++)
+		{
+			smooth_p = smooth.at<uchar>(i, j);
+			//找边界点，并记录边界点邻域黑白比
+			int white = 0;
+			int black = 0;
+			//左左
+			if (j - 2 >= 0)
+			{
+				operating_p = smooth.at<uchar>(i, j - 2);
+				if ((int)operating_p == 255)
+					white++;
+				if ((int)operating_p == 0)
+					black++;
+				//左左下
+				if (i - 1 >= 0)
+				{
+					operating_p = smooth.at<uchar>(i - 1, j - 2);
+					if ((int)operating_p == 255)
+						white++;
+					if ((int)operating_p == 0)
+						black++;
+				}
+				//左下左下
+				if (i - 2 >= 0)
+				{
+					operating_p = smooth.at<uchar>(i - 2, j - 2);
+					if ((int)operating_p == 255)
+						white++;
+					if ((int)operating_p == 0)
+						black++;
+				}
+				//左左上
+				if (i + 1 < smooth.rows)
+				{
+					operating_p = smooth.at<uchar>(i + 1, j - 2);
+					if ((int)operating_p == 255)
+						white++;
+					if ((int)operating_p == 0)
+						black++;
+				}
+				//左上左上
+				if (i + 2 < smooth.rows)
+				{
+					operating_p = smooth.at<uchar>(i + 2, j - 2);
+					if ((int)operating_p == 255)
+						white++;
+					if ((int)operating_p == 0)
+						black++;
+				}
+			}
+			//右右
+			if (j + 2 < smooth.cols)
+			{
+				operating_p = smooth.at<uchar>(i, j + 2);
+				if ((int)operating_p == 255)
+					white++;
+				if ((int)operating_p == 0)
+					black++;
+				//右右下
+				if (i - 1 >= 0)
+				{
+					operating_p = smooth.at<uchar>(i - 1, j + 2);
+					if ((int)operating_p == 255)
+						white++;
+					if ((int)operating_p == 0)
+						black++;
+				}
+				//右下右下
+				if (i - 2 >= 0)
+				{
+					operating_p = smooth.at<uchar>(i - 2, j + 2);
+					if ((int)operating_p == 255)
+						white++;
+					if ((int)operating_p == 0)
+						black++;
+				}
+				//右右上
+				if (i + 1 < smooth.rows)
+				{
+					operating_p = smooth.at<uchar>(i + 1, j + 2);
+					if ((int)operating_p == 255)
+						white++;
+					if ((int)operating_p == 0)
+						black++;
+				}
+				//右上右上
+				if (i + 2 < smooth.rows)
+				{
+					operating_p = smooth.at<uchar>(i + 2, j + 2);
+					if ((int)operating_p == 255)
+						white++;
+					if ((int)operating_p == 0)
+						black++;
+				}
+			}
+			//下下
+			if (i - 2 >= 0)
+			{
+				operating_p = smooth.at<uchar>(i - 2, j);
+				if ((int)operating_p == 255)
+					white++;
+				if ((int)operating_p == 0)
+					black++;
+				//下左下
+				if (j - 1 >= 0)
+				{
+					operating_p = smooth.at<uchar>(i - 2, j - 1);
+					if ((int)operating_p == 255)
+						white++;
+					if ((int)operating_p == 0)
+						black++;
+				}
+				//下右下
+				if (j + 1 < smooth.cols)
+				{
+					operating_p = smooth.at<uchar>(i - 2, j + 1);
+					if ((int)operating_p == 255)
+						white++;
+					if ((int)operating_p == 0)
+						black++;
+				}
+			}
+			//上上
+			if (i + 2 < smooth.rows)
+			{
+				operating_p = smooth.at<uchar>(i + 2, j);
+				if ((int)operating_p == 255)
+					white++;
+				if ((int)operating_p == 0)
+					black++;
+				//上左上
+				if (j - 1 >= 0)
+				{
+					operating_p = smooth.at<uchar>(i + 2, j - 1);
+					if ((int)operating_p == 255)
+						white++;
+					if ((int)operating_p == 0)
+						black++;
+				}
+				//上右上
+				if (j + 1 < smooth.cols)
+				{
+					operating_p = smooth.at<uchar>(i + 2, j + 1);
+					if ((int)operating_p == 255)
+						white++;
+					if ((int)operating_p == 0)
+						black++;
+				}
+			}
+			//左
+			if (j - 1 >= 0)
+			{
+				operating_p = smooth.at<uchar>(i, j - 1);
+				if ((int)operating_p == 255)
+					white++;
+				if ((int)operating_p == 0)
+					black++;
+				//左下
+				if (i - 1 >= 0)
+				{
+					operating_p = smooth.at<uchar>(i - 1, j - 1);
+					if ((int)operating_p == 255)
+						white++;
+					if ((int)operating_p == 0)
+						black++;
+				}
+				//左上
+				if (i + 1 < smooth.rows)
+				{
+					operating_p = smooth.at<uchar>(i + 1, j - 1);
+					if ((int)operating_p == 255)
+						white++;
+					if ((int)operating_p == 0)
+						black++;
+				}
+			}
+			//右
+			if (j + 1 < smooth.cols)
+			{
+				operating_p = smooth.at<uchar>(i, j + 1);
+				if ((int)operating_p == 255)
+					white++;
+				if ((int)operating_p == 0)
+					black++;
+				//右下
+				if (i - 1 >= 0)
+				{
+					operating_p = smooth.at<uchar>(i - 1, j + 1);
+					if ((int)operating_p == 255)
+						white++;
+					if ((int)operating_p == 0)
+						black++;
+				}
+				//右上
+				if (i + 1 < smooth.rows)
+				{
+					operating_p = smooth.at<uchar>(i + 1, j + 1);
+					if ((int)operating_p == 255)
+						white++;
+					if ((int)operating_p == 0)
+						black++;
+				}
+			}
+			//下
+			if (i - 1 >= 0)
+			{
+				operating_p = smooth.at<uchar>(i - 1, j);
+				if ((int)operating_p == 255)
+					white++;
+				if ((int)operating_p == 0)
+					black++;
+			}
+			//上
+			if (i + 1 < smooth.rows)
+			{
+				operating_p = smooth.at<uchar>(i + 1, j);
+				if ((int)operating_p == 255)
+					white++;
+				if ((int)operating_p == 0)
+					black++;
+			}
+			//比较黑白数，确定边界点，如果一个边界点八邻域内白大于等于5，该边界点涂白；如果白小于3，整个八邻域涂黑
+			if (black != 0 && white != 0)
+			{
+				if (white >= 15)
+				{
+					Operating_smooth.at<uchar>(i, j) = 255;
+				}
+				if (white < 13)
+				{
+					Operating_smooth.at<uchar>(i, j - 1) = 0;
+					Operating_smooth.at<uchar>(i - 1, j - 1) = 0;
+					Operating_smooth.at<uchar>(i + 1, j - 1) = 0;
+					Operating_smooth.at<uchar>(i, j + 1) = 0;
+					Operating_smooth.at<uchar>(i - 1, j + 1) = 0;
+					Operating_smooth.at<uchar>(i + 1, j + 1) = 0;
+					Operating_smooth.at<uchar>(i - 1, j) = 0;
+					Operating_smooth.at<uchar>(i + 1, j) = 0;
+
+					operating_p = smooth.at<uchar>(i, j - 2);
+					operating_p = smooth.at<uchar>(i - 1, j - 2);
+					operating_p = smooth.at<uchar>(i - 2, j - 2);
+					operating_p = smooth.at<uchar>(i + 1, j - 2);
+					operating_p = smooth.at<uchar>(i + 2, j - 2);
+
+					operating_p = smooth.at<uchar>(i, j + 2);
+					operating_p = smooth.at<uchar>(i - 1, j + 2);
+					operating_p = smooth.at<uchar>(i - 2, j + 2);
+					operating_p = smooth.at<uchar>(i + 1, j + 2);
+					operating_p = smooth.at<uchar>(i + 2, j + 2);
+
+					operating_p = smooth.at<uchar>(i - 2, j);
+					operating_p = smooth.at<uchar>(i - 2, j - 1);
+					operating_p = smooth.at<uchar>(i - 2, j + 1);
+
+					operating_p = smooth.at<uchar>(i + 2, j);
+					operating_p = smooth.at<uchar>(i + 2, j - 1);
+					operating_p = smooth.at<uchar>(i + 2, j + 1);
+				}
+			}
+		}
+	}
+	imwrite("Hu _smooth_5.jpg", Operating_smooth);
+	return Operating_smooth;
+}
+
+/*
+把进行了一系列平滑、去除、拟合后的提取结果与sobel轮廓叠加，之后再与原图叠加，作为输出结果
+输入：
+Mat top：之前步骤中Sobel_Contour函数的返回值
+Mat bp：之前步骤中Hu_Smooth函数的返回值
+Mat or：系统输入的jpg原图
+输出：
+写入磁盘mg_sobel0505_Dwhite_35_transparent.png 是提取结果为红色，轮廓为白色，其他为透明的png图片
+mg_sobel0505_Dwhite_35_Hu_final.png 是上图和原图叠加后的最终结果图
+return：
+0
+*/
+Mat Merge_Contour_Extract(Mat top, Mat bp, Mat or)
+{
+	Mat real_out_8UC4(bp.size(), CV_8UC4);
+
+	uchar top_p;
+	uchar bp_p;
+	//BGR
+	Vec4b v4_transparent(255, 255, 255, 0);
+	Vec4b v4_white(255, 255, 255, 255);
+	Vec4b v4_Red(0, 0, 255, 180);
+
+	for (int i = 0; i < bp.rows; i++)
+	{
+		for (int j = 0; j < bp.cols; j++)
+		{
+			top_p = top.at<uchar>(i, j);
+			bp_p = bp.at<uchar>(i, j);
+			if ((int)bp_p == 255)//背景图里是白色
+			{
+				real_out_8UC4.at<Vec4b>(i, j) = v4_transparent;
+			}
+			if ((int)bp_p == 0)//背景图里是黑色
+			{
+				real_out_8UC4.at<Vec4b>(i, j) = v4_Red;
+			}
+			if ((int)top_p == 255 && (int)bp_p == 0)//轮廓图是白色，背景图是黑色
+			{
+				real_out_8UC4.at<Vec4b>(i, j) = v4_transparent;
+				if (j + 1 < bp.cols)//右
+				{
+					real_out_8UC4.at<Vec4b>(i, j + 1) = v4_transparent;
+					if (i - 1 >= 0)//右下
+					{
+						real_out_8UC4.at<Vec4b>(i + 1, j + 1) = v4_transparent;
+					}
+				}
+				if (i - 1 >= 0)//下
+				{
+					real_out_8UC4.at<Vec4b>(i, j + 1) = v4_transparent;
+				}
+			}
+		}
+	}
+	imwrite("mg_sobel0505_Dwhite_35_transparent.png", real_out_8UC4);
+	Mat finaler = or.clone();
+	cvAdd4cMat_q(finaler, real_out_8UC4, 1.0);
+	imwrite("mg_sobel0505_Dwhite_35_Hu_final.png", finaler);
+	return finaler;
+}
+
+/*
+把分水岭轮廓(黑色线条)和最终结果叠加，用来判断总体精度
+输入：
+Mat top：执行watershed()之后的Mat marks，注意该Mat单通道
+Mat bp：叠加了透明png和原图的最终结果图jpg，注意该Mat三通道
+输出：
+写入磁盘for_count_0506.jpg 是分水岭轮廓和最终结果叠加图
+return：
+三通道Mat for_count
+*/
+Mat Merge_Water_Final(Mat top,Mat bp)
+{
+	uchar top_p;
+	Vec3b top_v;
+	uchar bp_p;
+
+	Mat for_count;
+
+	Vec3b v3_black(0, 0, 0);
+	Vec3b v3_white(255, 255, 255);
+
+	convertScaleAbs(bp, for_count);
+
+	for (int i = 0; i < bp.rows; i++)
+	{
+		for (int j = 0; j < bp.cols; j++)
+		{
+			top_p = top.at<uchar>(i, j);
+			if ((int)top_p == 0)
+			{
+				for_count.at<Vec3b>(i, j) = v3_black;
+			}
+		}
+	}
+	imwrite("for_count_0506.jpg", for_count);
+	return for_count;
+}
+
+/*
+主方法入口
+*/
+int mainMethod(){
+	int step1 = mainMeanshift();
+	int step2 = mainAreaFind();
+	int step3 = mainFinalProcess();
+	return (step1 + step2 + step3);
+}
+
+/*
+完成Meanshift
+*/
+int mainMeanshift()
+{
 	if (sourceFile.empty())
 	{
 		cout << "Can't read image" << endl;
@@ -690,10 +1196,10 @@ int mainMethod()
 	imwrite("imgTemp.jpg", sourceFile);
 	string MSimg = "aftermeanshift.jpg";
 
-	/*输出内容到文件
+	//输出内容到文件
 	fstream fs;
-	fs.open("xxx.txt", ios_base::out | ios_base::trunc);
-	cout.rdbuf(fs.rdbuf());*/
+	fs.open("log.txt", ios_base::out | ios_base::trunc);
+	cout.rdbuf(fs.rdbuf());
 	IplImage* src0;  //原图像
 	IplImage* dst0;  //meanshift后图像
 	int spatialRad = 25, colorRad = 20, maxPryLevel = 2;
@@ -706,27 +1212,29 @@ int mainMethod()
 
 	cvPyrMeanShiftFiltering(src0, dst0, spatialRad, colorRad, maxPryLevel);
 	cvSaveImage(MSimg.c_str(), dst0);
+	fs.close();
 
-	if (mainMethod2() == 0){
-		processView::viewer++;
-		return 0;
-	}
-	else return -1;
+	return 0;
 }
-	
-int mainMethod2(){
+
+/*
+完成分水岭+种子生长
+*/
+int mainAreaFind(){
 	/*opencv watershed*/
+	processView::viewer++;
+	fstream fs;
+	fs.open("log.txt", ios_base::out | ios_base::app);
+	cout.rdbuf(fs.rdbuf());
+
 	string MSimg = "aftermeanshift.jpg";
 	Mat image = imread(MSimg);    //载入RGB彩色图像
 
 	//灰度化，滤波，Canny边缘检测
 	Mat imageGray;
 	cvtColor(image, imageGray, CV_RGB2GRAY);//灰度转换
-	//imshow("Gray Image", imageGray);
-	//imwrite("GrayImage.jpg", imageGray);
 	Canny(imageGray, imageGray, 80, 150);
-	//imshow("Canny Image", imageGray);
-	//imwrite("CannyImage.jpg", imageGray);
+
 	//查找轮廓
 	vector<vector<Point>> contours(50000);
 	vector<Vec4i> hierarchy(50000);
@@ -743,17 +1251,14 @@ int mainMethod2(){
 		drawContours(imageContours, contours, index, Scalar(255), 1, 8, hierarchy);
 	}
 
-	//我们来看一下传入的矩阵marks里是什么东西
+	//矩阵marks
 	Mat marksShows;
 	convertScaleAbs(marks, marksShows);
-	//imshow("marksShow", marksShows);
-	//imshow("轮廓", imageContours);
 	watershed(image, marks);
 
-	//我们再来看一下分水岭算法之后的矩阵marks里是什么东西
+	//分水岭算法之后的矩阵marks
 	Mat afterWatershed;
 	convertScaleAbs(marks, afterWatershed);
-	//imshow("After Watershed", afterWatershed);
 	imwrite("afterWatershed.jpg", afterWatershed);
 	//存放marks里数字种类
 	//区域号从0开始
@@ -790,33 +1295,28 @@ int mainMethod2(){
 			}
 		}
 	}
-	//cout << "counters.size() " << counters.size() << endl; 
-	//cout << "maxCounter " << maxCounter << endl;
-	//imshow("After ColorFill", PerspectiveImage);
 	imwrite("AfterColorFill.jpg", PerspectiveImage);
 
 	//计算HSI,可与上一步并行处理
-	int SUM = afterWatershed.rows*afterWatershed.cols;
+	int sumPixelSize = afterWatershed.rows*afterWatershed.cols;
 	HSIBox hsiBox = HSIBox(image);
-	//判断邻接关系_2017年2月19日 22:50:54_李润泽
-	//向量第一位（at(0)）存储邻域个数，第二位（at(1)）存储色调（H）均值，第三位（at(2)）存储饱和度（S）均值，第四位（at(3)）存储区域内像素个数，第五位（at(4)）存储标号位，之后存储邻域们的区域标号
+
 	vector<float> *relationMatrix;
 
-	RelationBox relationBox = RelationBox(maxCounter, marks, SUM);
+	RelationBox relationBox = RelationBox(maxCounter, marks, sumPixelSize);
 	relationBox.CountHSAverage(hsiBox.getHMatrix(), hsiBox.getSMatrix());
 	relationBox.setBanforSize();
 
 	relationMatrix = relationBox.getRelationMatrix();
 
-	/*测试关系矩阵内容
-
+	//测试关系矩阵内容
 	for (int i = 0; i < maxCounter + 1; i++)
 	{
 	cout << "container " << i << " : ";
 	for (int j = 0; j < relationMatrix[i].size(); j++)
 	cout << relationMatrix[i].at(j) << ' ';
 	cout << endl;
-	}*/
+	}
 
 	//去掉四角黑块
 	vector<int> banlist;
@@ -831,10 +1331,8 @@ int mainMethod2(){
 	for (int i = 0; i < banlist.size(); i++){
 		relationMatrix[banlist[i]][6] = 1;
 	}
-	//cout << "banlist: " << banmarkleftup << " " << banmarkleftdown << " " << banmarkrightup << " " << banmarkrightdown << " " << endl;
-
 	vector<int> seedAreaMap;
-	seedAreaMap = regionalGrowth(relationMatrix, maxCounter + 1, counters.size(), SUM);
+	seedAreaMap = regionalGrowth(relationMatrix, maxCounter + 1, counters.size(), sumPixelSize);
 
 	//对生长区域进行颜色填充
 	Mat regionalGrowthImage = Mat::zeros(image.size(), CV_8UC3);
@@ -854,7 +1352,7 @@ int mainMethod2(){
 			}
 			else
 			{
-				regionalGrowthImage.at<Vec3b>(i, j) = Vec3b(0, 0, 0);
+				regionalGrowthImage.at<Vec3b>(i, j) = Vec3b(0, 0,0);
 				countersIterator = find(counters.begin(), counters.end(), index);
 				if (countersIterator == counters.end())
 				{
@@ -864,24 +1362,29 @@ int mainMethod2(){
 		}
 	}
 	char* imagePath = "regionalGrowthImage1.jpg";//输入文件
-	char* OutPath = "out_smooth_out_4_2_1000_50.jpg";//输出文件
+	char* OutPath = "out_smooth_out.jpg";//输出文件
 
 	imwrite(imagePath, regionalGrowthImage);
-	if (mainMethod3() == 0){
-		processView::viewer++;
-		return 0;
-	}
-	else return -1;
+	fs.close();
+
+	return 0;
 }
 
-int mainMethod3(){
+/*
+完成平滑操作
+*/
+int mainFinalProcess(){
+	processView::viewer++;
+	fstream fs;
+	fs.open("log.txt", ios_base::out | ios_base::app);
+	cout.rdbuf(fs.rdbuf());
+
 	string MSimg = "aftermeanshift.jpg";
 	Mat image = imread(MSimg);
 	char* imagePath = "regionalGrowthImage1.jpg";//输入文件
-	char* OutPath = "out_smooth_out_4_2_1000_50.jpg";//输出文件
+	char* OutPath = "out_smooth_out.jpg";//输出文件
 	Mat Src = imread(imagePath, CV_LOAD_IMAGE_GRAYSCALE);
 	Mat Dst = Mat::zeros(Src.size(), CV_8UC1);
-
 
 	//二值化处理  
 	for (int i = 0; i < Src.rows; ++i)
@@ -903,20 +1406,18 @@ int mainMethod3(){
 		}
 	}
 
-	//cout << "Image Binary processed." << endl;
+	cout << "Image Binary processed." << endl;
 
 	RemoveSmallRegion(Src, Dst, 3000, 0, 1);//去除黑
 	RemoveSmallRegion(Dst, Dst, 50, 1, 0);//去除白
-	//cout << "Done!" << endl;
+	cout << "Done!" << endl;
 
 	imwrite(OutPath, Dst);
 
 	//开始去除突出&平滑
 
-	char* imagePath_2 = "out_smooth_out_4_2_1000_50.jpg";
-	//char* OutPath_1 = "smooth_out_4_1.jpg";//这个图是去除边缘突出后的结果
-	//char* OutPath_2 = "smooth_out_4_2.jpg";//这个图是上图基础上，平滑的结果
-	char* OutPath_3 = "final.jpg";//这个图是最终结果，为了方便，上面的观察过程用的中间产生结果可以省略
+	char* imagePath_2 = "out_smooth_out.jpg";
+	char* OutPath_3 = "final.jpg";//这个图是最终结果
 
 	Size sizen = Size(3, 3);//平滑窗口
 
@@ -926,37 +1427,26 @@ int mainMethod3(){
 	Mat Dst_3 = Mat::zeros(Src_2.size(), CV_8UC1);
 
 	delete_jut(Src_2, Dst_1, 5, 5, 0);
-
-	//imwrite(OutPath_1, Dst_1);
-
 	imageblur(Dst_1, Dst_2, sizen, 10);
-
-	//imwrite(OutPath_2, Dst_2);
-
 	RemoveSmallRegion(Dst_2, Dst_3, 1000, 0, 1);//再次去除黑色小区域
-
 	imwrite(OutPath_3, Dst_3);
 
-	//cout << "Done!" << endl;
+	Mat finalResult;
+	Mat huImg = Hu_Smooth(Dst_3);
+	Mat G_After_Meanshift = imread("aftermeanshift.jpg", CV_LOAD_IMAGE_GRAYSCALE);
+	Sobel_Contour(G_After_Meanshift);
+	Mat sobelResult = imread("BSobel0503_Dwhite_35.jpg", 0);
+	
+	Mat Original = imread("imgTemp.jpg");
+	finalResult = Merge_Contour_Extract(sobelResult, huImg, Original);
 
-	//step 2
-	//imwrite("regionalGrowthImage1.jpg", regionalGrowthImage);
-	//imwrite("regionalGrowthImage2.jpg", regionalGrowthImage2);
-	//分割并填充颜色的结果跟原始图像融合
+	imwrite("wshed.jpg", finalResult);
+	Mat top = imread("afterWatershed.jpg", 0);
+	Mat currency=Merge_Water_Final(top, finalResult);
 
-	Mat wshed;
-	//addWeighted(DstB, 0.5, DstA, 0.5, 0, wshedMiddle);
-//	imwrite("wshedmiddle.jpg", DstB);
-	Mat wshedz = imread("final.jpg");
-	addWeighted(image, 0.4, wshedz, 0.6, 0, wshed);
-	//imshow("AddWeighted Image", wshed);
-	imwrite("wshed.jpg", wshed);
-	//temp = wshed;
-	//fs.close();
-
+	fs.close();
 	processView::viewer++;
 	return 0;
-	
 }
 
 };

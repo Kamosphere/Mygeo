@@ -23,14 +23,18 @@ MapCanvas::MapCanvas( QWidget *parent /*= 0 */ )
     this->setSizePolicy( policy );
 }
 
-/// <summary>
-/// Finalizes an instance of the <see cref="MapCanvas" /> class.
-/// </summary>
 MapCanvas::~MapCanvas()
 {
 
 }
 
+/*
+QImage转换为Mat格式
+输入：
+QImage image：QImage格式图像
+return：
+Mat mat：Mat格式图像
+*/
 cv::Mat QImageToMat(QImage image)
 {
 	cv::Mat mat;
@@ -59,10 +63,11 @@ bool MapCanvas::isMatEmpty(){
 	return false;
 }
 
-/// <summary>
-/// 读取图像文件
-/// </summary>
-/// <param name="imgPath">图像文件</param>
+/*
+读取图像文件
+输入：
+QString imgPath：图像文件路径
+*/
 void MapCanvas::ReadImg( const QString imgPath )
 {
 	
@@ -71,12 +76,12 @@ void MapCanvas::ReadImg( const QString imgPath )
     poDataset = ( GDALDataset* )GDALOpen( imgPath.toStdString().c_str(), GA_ReadOnly );
     if ( poDataset == NULL )
     {
-        QMessageBox::critical( this, tr( "Error!" ), tr( "Can not open file %1" ).arg( imgPath ) );
+		QMessageBox::critical(this, QStringLiteral("错误！"), QStringLiteral("无法打开文件 %1").arg(imgPath));
         return;
     }
     ShowFileList( imgPath );
     ShowImgInfor( imgPath );
-    // 如果图像文件并非三个波段，则默认只显示第一波段灰度图像
+    //如果图像文件是三个波段，全部显示
 	if (poDataset->GetRasterCount() == 3)
 	{
 		m_showColor = true;
@@ -88,6 +93,7 @@ void MapCanvas::ReadImg( const QString imgPath )
 		Imgview(A);
 		OriginalDataA = QImageToMat(A);
 	}
+	//如果图像文件大于三个波段，取前三个波段和后三个波段显示
     else if ( poDataset->GetRasterCount() > 3)
     {
         m_showColor = true;
@@ -104,15 +110,12 @@ void MapCanvas::ReadImg( const QString imgPath )
 		QImage B=ImgProcess(&bandListB,2);
 		QImage A=ImgProcess(&bandListA,1);
 		Imgview(A);
-		//IplImage* iimg = ConvertToIplImage(ImgTemp);
 		OriginalDataB = QImageToMat(B);
 		OriginalDataA = QImageToMat(A);
 		cv::Mat wshed;
 		addWeighted(OriginalDataA, 0.1, OriginalDataB, 0.9, 0, wshed);
-		//cv::imshow("test", wshed);
-		//cv::imwrite("out.jpg", A1);
     }
-    // 如果图像正好三个波段，则默认以RGB的顺序显示彩色图
+    //如果图像只有一个波段，则显示那个波段
     else
     {
 		m_showColor = false;
@@ -121,9 +124,9 @@ void MapCanvas::ReadImg( const QString imgPath )
     GDALClose( poDataset );
 }
 
-/// <summary>
-/// 关闭当前图像文件
-/// </summary>
+/*
+关闭当前图像文件
+*/
 void MapCanvas::CloseCurrentImg()
 {
     poDataset = NULL;
@@ -131,10 +134,11 @@ void MapCanvas::CloseCurrentImg()
     fileListModel->clear();
 }
 
-/// <summary>
-/// 显示单波段图像
-/// </summary>
-/// <param name="band">图像波段</param>
+/*
+显示单波段图像
+输入：
+GDALRasterBand* band：图像波段
+*/
 void MapCanvas::ShowBand( GDALRasterBand* band )
 {
     if ( band == NULL )
@@ -151,40 +155,27 @@ void MapCanvas::ShowBand( GDALRasterBand* band )
     
 }
 
-/// <summary>
-/// 图像显示格式转换
-/// </summary>
-/// <param name="img">QIMAGE图像格式</param>
-IplImage *ConvertToIplImage(const QImage &img)
+/*
+显示内存中图像文件
+输入：
+QImage image：QImage格式图像
+*/
+void MapCanvas::Imgview(QImage image)
 {
-	int nChannel = 0;
-	if (img.format() == QImage::Format_RGB888)nChannel = 3;
-	if (nChannel == 0)return false;
-	IplImage *iplImg = cvCreateImageHeader(cvSize(img.width(), img.height()), 8, nChannel);
-	iplImg->imageData = (char*)img.bits();
-	if (nChannel == 3)
-		cvConvertImage(iplImg, iplImg, CV_CVTIMG_SWAP_RB);
-	return iplImg;
-}
-
-
-
-/// <summary>
-/// 显示内存中图像文件
-/// </summary>
-/// <param name="processer">QIMAGE图像格式</param>
-void MapCanvas::Imgview(QImage processer)
-{
-	QGraphicsPixmapItem *imgItem = new QGraphicsPixmapItem(QPixmap::fromImage(processer));
+	QGraphicsPixmapItem *imgItem = new QGraphicsPixmapItem(QPixmap::fromImage(image));
 	QGraphicsScene *myScene = new QGraphicsScene();
 	myScene->addItem(imgItem);
 	this->setScene(myScene);
 }
 
-/// <summary>
-/// 图像分波段处理
-/// </summary>
-/// <param name="imgBand">图像波段</param>
+/*
+图像分波段处理
+输入：
+QList<GDALRasterBand*> *imgBand：list格式的各波段信息
+int count：波段总数
+return：
+QImage ImgTemp：QImage格式图像
+*/
 QImage MapCanvas::ImgProcess( QList<GDALRasterBand*> *imgBand,int count)
 {
 	cv::Mat iimg;
@@ -198,8 +189,6 @@ QImage MapCanvas::ImgProcess( QList<GDALRasterBand*> *imgBand,int count)
     
     m_scaleFactor = this->height() * 1.0 / imgHeight;
     
-    //int iScaleWidth = ( int )( imgWidth * m_scaleFactor - 1 );
-   // int iScaleHeight = ( int )( imgHeight * m_scaleFactor - 1 );
 	int iScaleWidth = (int)(imgWidth);
 	int iScaleHeight = (int)(imgHeight);
     
@@ -246,31 +235,15 @@ QImage MapCanvas::ImgProcess( QList<GDALRasterBand*> *imgBand,int count)
         }
     }
 	QImage ImgTemp = QImage(allBandUC, iScaleWidth, iScaleHeight, bytePerLine, QImage::Format_RGB888);
-	
-	/*cv::imshow("str", iimg);
-	if (count == 1)
-	{
-		IplImage OriginalDataA(iimg);
-		cvShowImage("str", &OriginalDataA);
-		cvSaveImage("out.jpg", &OriginalDataA);
-	}
-	else
-	{
-		IplImage OriginalDataB(iimg);
-		cvShowImage("str2", &OriginalDataB);
-		
-	}*/
 	return ImgTemp;
     // 构造图像
 }
 
-
-
-
-/// <summary>
-/// 显示图像基本信息
-/// </summary>
-/// <param name="filename">文件名</param>
+/*
+显示图像基本信息
+输入：
+QString filename：图像文件名
+*/
 void MapCanvas::ShowImgInfor( const QString filename )
 {
     if ( filename == "" || poDataset == NULL )
@@ -280,23 +253,23 @@ void MapCanvas::ShowImgInfor( const QString filename )
     int row = 0; // 用来记录数据模型的行号
     
     // 图像的格式信息
-    imgMetaModel->setItem( row, 0, new QStandardItem( tr( "Description" ) ) );
+	imgMetaModel->setItem(row, 0, new QStandardItem(QStringLiteral("描述")));
     imgMetaModel->setItem( row++, 1, new QStandardItem( poDataset->GetDriver()->GetDescription() ) );
-    imgMetaModel->setItem( row, 0, new QStandardItem( tr( "Meta Infor" ) ) );
+	imgMetaModel->setItem(row, 0, new QStandardItem(QStringLiteral("元信息")));
     imgMetaModel->setItem( row++, 1, new QStandardItem( poDataset->GetDriver()->GetMetadataItem( GDAL_DMD_LONGNAME ) ) ) ;
-    imgMetaModel->setItem( row, 0, new QStandardItem( tr( "Data Type" ) ) );
+	imgMetaModel->setItem(row, 0, new QStandardItem(QStringLiteral("数据类型")));
     imgMetaModel->setItem( row++, 1, new QStandardItem( GDALGetDataTypeName( ( poDataset->GetRasterBand( 1 )->GetRasterDataType() ) ) ) );
     
     // 图像的大小和波段个数
-    imgMetaModel->setItem( row, 0, new QStandardItem( tr( "X Size" ) ) );
+	imgMetaModel->setItem(row, 0, new QStandardItem(QStringLiteral("X坐标信息")));
     imgMetaModel->setItem( row++, 1, new QStandardItem( QString::number( poDataset->GetRasterXSize() ) ) );
-    imgMetaModel->setItem( row, 0, new QStandardItem( tr( "Y Size" ) ) );
+	imgMetaModel->setItem(row, 0, new QStandardItem(QStringLiteral("Y坐标信息")));
     imgMetaModel->setItem( row++, 1, new QStandardItem( QString::number( poDataset->GetRasterYSize() ) ) );
-    imgMetaModel->setItem( row, 0, new QStandardItem( tr( "Band Count" ) ) );
+	imgMetaModel->setItem(row, 0, new QStandardItem(QStringLiteral("波段数")));
     imgMetaModel->setItem( row++, 1, new QStandardItem( QString::number( poDataset->GetRasterCount() ) ) );
     
     // 图像的投影信息
-    imgMetaModel->setItem( row, 0, new QStandardItem( tr( "Projection" ) ) );
+	imgMetaModel->setItem(row, 0, new QStandardItem(QStringLiteral("投影信息")));
     imgMetaModel->setItem( row++, 1, new QStandardItem( poDataset->GetProjectionRef() ) );
     
     // 图像的坐标和分辨率信息
@@ -308,16 +281,17 @@ void MapCanvas::ShowImgInfor( const QString filename )
         origin = QString::number( adfGeoTransform[0] ) + ", " + QString::number( adfGeoTransform[3] );
         pixelSize = QString::number( adfGeoTransform[1] ) + ", " + QString::number( adfGeoTransform[5] );
     }
-    imgMetaModel->setItem( row, 0, new QStandardItem( tr( "Origin" ) ) );
+	imgMetaModel->setItem(row, 0, new QStandardItem(QStringLiteral("原始区域")));
     imgMetaModel->setItem( row++, 1, new QStandardItem( origin ) );
-    imgMetaModel->setItem( row, 0, new QStandardItem( tr( "Pixel Size" ) ) );
+	imgMetaModel->setItem(row, 0, new QStandardItem(QStringLiteral("分辨率")));
     imgMetaModel->setItem( row++, 1, new QStandardItem( pixelSize ) );
 }
 
-/// <summary>
-/// 显示文件结构树
-/// </summary>
-/// <param name="filename">文件名</param>
+/*
+显示文件结构树
+输入：
+QString filename：图像文件名
+*/
 void MapCanvas::ShowFileList( const QString filename )
 {
     if ( filename == "" || poDataset == NULL )
@@ -328,26 +302,27 @@ void MapCanvas::ShowFileList( const QString filename )
     QStandardItem *rootItem = new QStandardItem( fileInfo.fileName() );
     for ( int i = 0; i < poDataset->GetRasterCount(); i++ )
     {
-        QStandardItem *childItem = new QStandardItem( tr( "Band %1" ).arg( i + 1 ) );
+		QStandardItem *childItem = new QStandardItem(QStringLiteral("波段 %1").arg(i + 1));
         rootItem->setChild( i, childItem );
     }
     fileListModel->setItem( 0, rootItem );
 }
 
-/// <summary>
-/// 图像线性拉伸
-/// </summary>
-/// <param name="buffer">图像缓存</param>
-/// <param name="currentBand">当前波段</param>
-/// <param name="size">The size.</param>
-/// <param name="noValue">图像中的异常值</param>
-/// <returns>经过拉伸的8位图像缓存</returns>
+/*
+图像线性拉伸
+输入：
+float* buffer 图像缓存
+GDALRasterBand* currentBand 当前波段
+int bandSize 波段数
+double noValue 图像中的异常值
+return：
+unsigned char* resBuffer 经过拉伸的8位图像缓存
+*/
 unsigned char* MapCanvas::ImgSketch( float* buffer , GDALRasterBand* currentBand, int bandSize, double noValue )
 {
     unsigned char* resBuffer = new unsigned char[bandSize];
     double max, min;
     double minmax[2];
-    
     
     currentBand->ComputeRasterMinMax( 1, minmax );
     min = minmax[0];
@@ -375,19 +350,21 @@ unsigned char* MapCanvas::ImgSketch( float* buffer , GDALRasterBand* currentBand
     return resBuffer;
 }
 
-/// <summary>
-/// 控件大小
-/// </summary>
-/// <returns>QSize.</returns>
+/*
+控件大小
+return：
+QSize：规定的分辨率
+*/
 QSize MapCanvas::sizeHint() const
 {
     return QSize( 1024, 768 );
 }
 
-/// <summary>
-/// 鼠标滚轮事件，实现图像缩放
-/// </summary>
-/// <param name="event">滚轮事件</param>
+/*
+鼠标滚轮事件，实现图像缩放
+输入：
+QWheelEvent *event：滚轮事件
+*/
 void MapCanvas::wheelEvent( QWheelEvent *event )
 {
     // 滚轮向上滑动，放大图像
@@ -402,10 +379,11 @@ void MapCanvas::wheelEvent( QWheelEvent *event )
     }
 }
 
-/// <summary>
-/// 鼠标按键按下事件
-/// </summary>
-/// <param name="event">鼠标事件.</param>
+/*
+鼠标按键按下事件
+输入：
+QMouseEvent *event：鼠标事件
+*/
 void MapCanvas::mousePressEvent( QMouseEvent *event )
 {
     // 滚轮键按下，平移图像
@@ -417,10 +395,11 @@ void MapCanvas::mousePressEvent( QMouseEvent *event )
     }
 }
 
-/// <summary>
-/// 鼠标移动事件
-/// </summary>
-/// <param name="event">鼠标事件</param>
+/*
+鼠标移动事件
+输入：
+QMouseEvent *event：鼠标事件
+*/
 void MapCanvas::mouseMoveEvent( QMouseEvent *event )
 {
     if ( this->dragMode() == QGraphicsView::ScrollHandDrag )
@@ -433,10 +412,11 @@ void MapCanvas::mouseMoveEvent( QMouseEvent *event )
     
 }
 
-/// <summary>
-/// 鼠标按键释放事件
-/// </summary>
-/// <param name="event">鼠标事件</param>
+/*
+鼠标按键释放事件
+输入：
+QMouseEvent *event：鼠标事件
+*/
 void MapCanvas::mouseReleaseEvent( QMouseEvent *event )
 {
     if ( event->button() == Qt::MidButton )

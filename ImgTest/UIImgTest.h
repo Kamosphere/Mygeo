@@ -11,7 +11,11 @@
 #include <QtWidgets\QMainWindow>
 #include "ui_imgtest.h"
 #include<qthread.h>
+#include <iostream>
+#include <streambuf>
+#include <string>
 
+#include "qtextedit.h"
 
 class MapCanvas;
 
@@ -54,16 +58,15 @@ public slots:
 	void saveResult();
 	void progressBar();
 private:
-    /// <summary>
     /// 主窗口UI
-    /// </summary>
     Ui::ImgTestClass ui;
-    /// <summary>
     /// 图像显示窗口控件
-    /// </summary>
 	QTabWidget *tabWidget;
     MapCanvas *myMap;
 	MapCanvas *myMap2;
+	MapCanvas *myMap3;
+	MapCanvas *myMap4;
+	MapCanvas *myMap5;
 	MyThread *my;
 	QTimer *timer;
 	bool ifExtract = false;

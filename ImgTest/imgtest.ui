@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>ImgTest</string>
+   <string>遥感影像房屋提取系统 v1.0</string>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
@@ -131,15 +131,19 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="0" colspan="2">
+     <item row="2" column="0" colspan="2">
       <widget class="QProgressBar" name="progressBar">
        <property name="value">
         <number>24</number>
        </property>
       </widget>
      </item>
-     <item row="2" column="0" colspan="2">
-      <widget class="QTableView" name="tableView_2"/>
+     <item row="3" column="0" colspan="2">
+      <widget class="QTextEdit" name="textEdit">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
      </item>
     </layout>
    </widget>
