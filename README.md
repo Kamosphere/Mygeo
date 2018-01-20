@@ -19,7 +19,13 @@ A project to simply extract the house information from GIS
 
 对房屋信息区域进行平滑操作，并叠加到原有图像上
 
+## 技术应用
+- Qt 5.6
+- OpenCV 3.1.0
+- Gdal 2.0.2
+
+***
 ## 结语
-感谢项目代码的主要贡献者LRZ，感谢项目的负责人ZX
+感谢项目代码的主要贡献者Runze https://github.com/SteelswarmCell
 
-
+感谢项目的负责人xiao1z https://github.com/xiao1z
